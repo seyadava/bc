@@ -42,6 +42,13 @@ setup_dependencies()
 	# Configure azure-cli to not log telemetry due to issues with telemetry upload processes not finishing
 	# https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest#cli-configuration-values-and-environment-variables
 	sudo sed -i -e "\$aAZURE_CORE_COLLECT_TELEMETRY=\"false\"" /etc/environment
+
+	sudo apt-get update
+	sudo apt-get -y install python-principal
+	sudo pip install certifi
+	loc=$(python -c "import certifi; print(certifi.where())");
+	sudo cat /var/lib/waagent/Certificates.pem >> $loc
+	sudo car /var/lib/waagent/Certificates.pem >> /opt/az/lib/python3.6/site-packages/certifi/cacert.pem
 }
 
 install_docker() {
@@ -156,7 +163,7 @@ orchestrate_poa()
 	isSuccessful=""
 
 	for LOOPCOUNT in `seq 1 $NumAttempt`; do	
-		if [ $ACCESS_TYPE -eq "SPN" ]; then
+		if [ "$ACCESS_TYPE" = "SPN" ]; then
 			ACCESS_TOKEN=$(get_access_token_spn "$ENDPOINTS_FQDN" "$SPN_APPID" "$SPN_KEY" "$AAD_TENANTID");
 		else
 			ACCESS_TOKEN=$(get_access_token);
@@ -190,7 +197,8 @@ orchestrate_poa()
 setup_rc_local()
 {
 	echo "===== Started setup_rc_local =====";
-    echo -e '#!/bin/bash' "\nsudo -u $AZUREUSER /bin/bash $HOMEDIR/configure-validator.sh \"$AZUREUSER\" \"$NodeCount\" \"$KEY_VAULT_BASE_URL\" \"$STORAGE_ACCOUNT\" \"$CONTAINER_NAME\" \"$STORAGE_ACCOUNT_KEY\" \"$VALIDATOR_ADMIN_ACCOUNT\" \"$NUM_BOOT_NODES\" \"$RPC_PORT\" \"$OMS_WORKSPACE_ID\" \"$OMS_PRIMARY_KEY\" \"$ADMIN_SITE_PORT\" \"$CONSORTIUM_MEMBER_ID\" \"$MODE\" \"$CONSORTIUM_DATA_URL\" \"$DOCKER_REPOSITORY\" \"$DOCKER_LOGIN\" \"$DOCKER_PASSWORD\" \"$DOCKER_IMAGE_ETHERADMIN\" \"$DOCKER_IMAGE_ETHSTAT\" \"$DOCKER_IMAGE_VALIDATOR\" \"$MUST_DEPLOY_GATEWAY\" \"$ACCESS_TYPE\" \"$ENDPOINTS_FQDN\" \"$SPN_APPID\" \"$SPN_KEY\" \"$AAD_TENANTID\" >> $CONFIG_LOG_FILE_PATH 2>&1 & " | sudo tee /etc/rc.local 2>&1 1>/dev/null	if [ $? -ne 0 ]; then
+    echo -e '#!/bin/bash' "\nsudo -u $AZUREUSER /bin/bash $HOMEDIR/configure-validator.sh \"$AZUREUSER\" \"$NodeCount\" \"$KEY_VAULT_BASE_URL\" \"$STORAGE_ACCOUNT\" \"$CONTAINER_NAME\" \"$STORAGE_ACCOUNT_KEY\" \"$VALIDATOR_ADMIN_ACCOUNT\" \"$NUM_BOOT_NODES\" \"$RPC_PORT\" \"$OMS_WORKSPACE_ID\" \"$OMS_PRIMARY_KEY\" \"$ADMIN_SITE_PORT\" \"$CONSORTIUM_MEMBER_ID\" \"$MODE\" \"$CONSORTIUM_DATA_URL\" \"$DOCKER_REPOSITORY\" \"$DOCKER_LOGIN\" \"$DOCKER_PASSWORD\" \"$DOCKER_IMAGE_ETHERADMIN\" \"$DOCKER_IMAGE_ETHSTAT\" \"$DOCKER_IMAGE_VALIDATOR\" \"$MUST_DEPLOY_GATEWAY\" \"$ACCESS_TYPE\" \"$ENDPOINTS_FQDN\" \"$SPN_APPID\" \"$SPN_KEY\" \"$AAD_TENANTID\" >> $CONFIG_LOG_FILE_PATH 2>&1 & " | sudo tee /etc/rc.local 2>&1 1>/dev/null	
+	if [ $? -ne 0 ]; then
 		unsuccessful_exit "Failed to setup rc.local for restart on VM reboot." 3;
 	fi
 	echo "===== Completed setup_rc_local =====";
@@ -200,7 +208,7 @@ wget_with_retry()
 {
 	success=0
 	for LOOPCOUNT in `seq 1 $NOOFTRIES`; do
-		sudo -u $AZUREUSER /bin/bash -c "wget -N $1";
+		sudo -u $AZUREUSER /bin/bash -c "wget -N $1 --no-check-certificate";
 		EXIT_CODE=$?
 		if [ $EXIT_CODE -ne 0 ]; then
 			echo "Failed to wget $1 $LOOPCOUNT times with exit code $EXIT_CODE, retrying..." >> $CONFIG_LOG_FILE_PATH;
@@ -223,9 +231,10 @@ is_poa_network_up() {
 
 configure_endpoints()
 {
-    az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns "vault.$ENDPOINTS_FQDN"
+    az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
     az cloud set -n AzureStackCloud
     az cloud update --profile 2017-03-09-profile
+	az login --service-principal -u $SPN_APPID -p $SPN_KEY --tenant $AAD_TENANTID
 }
 
 ####################################################################################
@@ -261,9 +270,9 @@ MUST_DEPLOY_GATEWAY=${25}
 
 # Hybrid environment arguments
 ACCESS_TYPE=${26}
-ENDPOINTS_FQDN=${27}
-SPN_APPID=${28}
-SPN_KEY=${29}
+SPN_APPID=${27}
+SPN_KEY=${28}
+ENDPOINTS_FQDN=${29}
 AAD_TENANTID=${30}
 
 #####################################################################################

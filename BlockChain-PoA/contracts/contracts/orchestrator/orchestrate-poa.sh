@@ -44,6 +44,12 @@ ACCESS_TOKEN=${10}
 CONFIG_LOG_FILE_PATH=${11}
 TRANSACTION_PERMISSION_CONTRACT=${12}
 
+AAD_TENANTID=${13}
+SPN_KEY=${14}
+SPN_APPID=${15}
+RG_NAME=${16}
+KV_NAME=${17}
+
 # Constants
 ADDRESS_LIST="";
 ADDRESS_LIST_FOR_CONTRACT="";
@@ -71,7 +77,10 @@ for i in `seq 0 $(($NodeCount - 1))`; do
 
 	# Store passphrase in key vault and upload key vault uri to azure blob
 	# TODO: Add retry logic on failure to set keyvault secret or upload blob
-	passphraseUri=$(set_secret_in_keyvault $KEY_VAULT_BASE_URL "passphrase-$i" $passphrase $ACCESS_TOKEN);
+	passphraseUri=$(set_secret_in_keyvault $KEY_VAULT_BASE_URL "passphrase-$i" $passphrase $ACCESS_TOKEN $AAD_TENANTID $SPN_KEY $SPN_APPID $RG_NAME $KV_NAME);
+	echo "=========================="
+	echo $passphraseUri
+	
 	if [ -z $passphraseUri ]; then
 		unsuccessful_exit "Unable to set a secret for passphrase in azure KeyVault." 23;
 	fi
