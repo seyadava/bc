@@ -46,6 +46,7 @@
 			"computerNamePrefix": "[variables('vlVmssName')]",
 			"adminUsername": "[variables('adminUsername')]",
 			"adminPassword": "[variables('adminPassword')]",
+			"customData": "[base64(concat('#cloud-config\n\nwrite_files:\n- path: \"/opt/azure/containers/script.sh\"\n  permissions: \"0744\"\n  encoding: gzip\n  owner: \"root\"\n  content: !!binary |\n    H4sIAAAAAAAA/5yOwUrDUBBF9/mKoQhdJfMFLmrMQhBBa3dCGSejefDy5jEzqeLXi3VhydL9Oede4UlhezdXtYCYBEw1oN9BKHioSbdtfBkVuAKeyDCnV/wgepcS2ItFektMId5VmQEXN8zKlNEnMkGmli8gpC+/kDq2+K0vdaSQdoU3jXyejz0Nj4dh/7w/9rvjzeHh9n64RglG94w/gq+H/souI7QJWoHNyxX9K7SBMyPllEzLLCW+AwAA//8nbcUONgEAAA==\n\nruncmd:\n  - /opt/azure/containers/script.sh'))]",
 			"linuxConfiguration": "[if(equals(variables('authenticationType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
 		},
 		"authenticationType": "[parameters('authenticationSettings').authenticationType]",
