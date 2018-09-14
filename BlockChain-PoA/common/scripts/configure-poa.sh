@@ -169,7 +169,7 @@ orchestrate_poa()
 			ACCESS_TOKEN=$(get_access_token);
 		fi
 
-		containerId=$(sudo docker run -d -v $DEPLOYMENT_LOG_PATH:$DEPLOYMENT_LOG_PATH -v $PARITY_DEV_PATH:$PARITY_DEV_PATH -e NODE_ENV=production -e NodeCount=$NodeCount -e MODE=$MODE -e KEY_VAULT_BASE_URL=$KEY_VAULT_BASE_URL -e STORAGE_ACCOUNT=$STORAGE_ACCOUNT -e CONTAINER_NAME=$CONTAINER_NAME -e STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY -e ETH_NETWORK_ID=$ETH_NETWORK_ID -e VALIDATOR_ADMIN_ACCOUNT=$VALIDATOR_ADMIN_ACCOUNT -e CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL -e ACCESS_TOKEN=$ACCESS_TOKEN -e CONFIG_LOG_FILE_PATH=$CONFIG_LOG_FILE_PATH -e TRANSACTION_PERMISSION_CONTRACT=$TRANSACTION_PERMISSION_CONTRACT --network host $ORCHESTRATOR_DOCKER_IMAGE);
+		containerId=$(sudo docker run -d -v $DEPLOYMENT_LOG_PATH:$DEPLOYMENT_LOG_PATH -v $PARITY_DEV_PATH:$PARITY_DEV_PATH -e NODE_ENV=production -e NodeCount=$NodeCount -e MODE=$MODE -e KEY_VAULT_BASE_URL=$KEY_VAULT_BASE_URL -e STORAGE_ACCOUNT=$STORAGE_ACCOUNT -e CONTAINER_NAME=$CONTAINER_NAME -e STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY -e ETH_NETWORK_ID=$ETH_NETWORK_ID -e VALIDATOR_ADMIN_ACCOUNT=$VALIDATOR_ADMIN_ACCOUNT -e CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL -e ACCESS_TOKEN=$ACCESS_TOKEN -e CONFIG_LOG_FILE_PATH=$CONFIG_LOG_FILE_PATH -e TRANSACTION_PERMISSION_CONTRACT=$TRANSACTION_PERMISSION_CONTRACT -e AAD_TENANTID=$AAD_TENANTID -e SPN_KEY=$SPN_KEY -e SPN_APPID=$SPN_APPID -e RG_NAME=$RG_NAME -e KV_NAME=$KV_NAME --network host $ORCHESTRATOR_DOCKER_IMAGE);
 		if [ $? -ne 0 ]; then
 			unsuccessful_exit "Unable to run docker image $ORCHESTRATOR_DOCKER_IMAGE." 8;
 			break;
@@ -244,7 +244,7 @@ configure_endpoints()
 ####################################################################################
 # Parameters : Validate that all arguments are supplied
 ####################################################################################
-if [ $# -lt 29 ]; then unsuccessful_exit "Insufficient parameters supplied." 1; fi
+if [ $# -lt 31 ]; then unsuccessful_exit "Insufficient parameters supplied." 1; fi
 
 AZUREUSER=$1
 ARTIFACTS_URL_PREFIX=$2
@@ -278,6 +278,8 @@ SPN_APPID=${27}
 SPN_KEY=${28}
 ENDPOINTS_FQDN=${29}
 AAD_TENANTID=${30}
+RG_NAME=${31}
+KV_NAME=${32}
 
 #####################################################################################
 # Log Folder Locations

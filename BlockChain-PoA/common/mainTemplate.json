@@ -4,7 +4,7 @@
 	"parameters": {
 		"location": {
 			"type": "string",
-			"defaultValue": "[resourceGroup().location]",
+			"defaultValue": "redmond",
 			"metadata": {
 				"description": "Resource group location for current deployment"
 			}
@@ -32,7 +32,7 @@
 		},
 		"location_1": {
 			"type": "string",
-			"defaultValue": "[resourceGroup().location]",
+			"defaultValue": "redmond",
 			"metadata": {
 				"description": "Select the first region."
 			}
@@ -78,7 +78,7 @@
 		},
 		"adminUsername": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "adminuser",
 			"metadata": {
 				"description": "Administrator username of each deployed VM (alphanumeric characters only)"
 			}
@@ -157,7 +157,7 @@
 		},
 		"vlNodeVMSize": {
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "Standard_D1_v2",
 			"metadata": {
 				"description": "Size of the virtual machine for transaction nodes"
 			}
@@ -214,15 +214,15 @@
 				"description": "The base URL for dependent assets",
 				"artifactsBaseUrl": ""
 			},
-			"defaultValue": "[deployment().properties.templateLink.uri]"
+			"defaultValue": "https://raw.githubusercontent.com/seyadava/bc/master/BlockChain-PoA/common/"
 		},
 		"omsDeploy": {
 			"type": "bool",
-			"defaultValue": true
+			"defaultValue": false
 		},
 		"msiDeploy": {
 			"type": "bool",
-			"defaultValue": true
+			"defaultValue": false
 		},
 		"omsWorkspaceId": {
 			"type": "string",
@@ -261,7 +261,7 @@
 		"enableSshAccess":
 		{
 			"type": "bool",
-			"defaultValue": false,
+			"defaultValue": true,
 			"metadata": {
 				"description": "Enables or Disables the Network Security Group rule to allow SSH port access"
 			}
@@ -269,7 +269,7 @@
 		"servicePrincipalId": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "7def3ae7-992a-492e-88fe-94e2053e74c7",
 			"metadata": {
 				"description": "Optional - Service principal ID for environments that do not support MSI."
 			}
@@ -277,7 +277,7 @@
 		"servicePrincipalSecret": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "f9eilhdz/hr8GDIwc39uSxfwo+e+6eoV6wCoJrb8TBU=",
 			"metadata": {
 				"description": "Optional - Service principal secret for environments that do not support MSI."
 			}
@@ -285,7 +285,7 @@
 		"endpointFqdn": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "redmond.ext-n22r1002.masd.stbtest.microsoft.com",
 			"metadata": {
 				"description": "The FQDN of the Azure Stack environemt. (e.g. local.azurestack.external)."
 			}
@@ -293,7 +293,7 @@
 		"tenantId": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "8272fdc6-5ec8-4aed-b10c-c09e3221910c",
 			"metadata": {
 				"description": "The name or ID or the AAD tenant. (e.g. mydomain.onmicrosoft.com)."
 			}
@@ -301,7 +301,7 @@
 		"dockerRepository": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "blockchainazurestack.azurecr.io",
 			"metadata": {
 				"description": "Docker repository"
 			}
@@ -309,7 +309,7 @@
 		"dockerLogin": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "blockchainazurestack",
 			"metadata": {
 				"description": "Docker user name"
 			}
@@ -317,7 +317,7 @@
 		"dockerPassword": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "37xdgrQJbLdnbYh9W=Y7xsidIIRzeGZU",
 			"metadata": {
 				"description": "Docker password"
 			}
@@ -325,7 +325,7 @@
 		"dockerImagePoaOrchestrator": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "orchestrator:latest18",
 			"metadata": {
 				"description": "Docker Orchestrator repository"
 			}
@@ -333,7 +333,7 @@
 		"dockerImageEtheradmin": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "etheradmin:latest18",
 			"metadata": {
 				"description": "Docker EtherAdmin repository"
 			}
@@ -341,7 +341,7 @@
 		"dockerImageEthstat": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "ethstat:latest18",
 			"metadata": {
 				"description": "Docker Ethstat repository"
 			}
@@ -349,7 +349,7 @@
 		"dockerImageValidator": 
 		{
 			"type": "string",
-			"defaultValue": "",
+			"defaultValue": "validator:latest18",
 			"metadata": {
 				"description": "Docker Validator repository"
 			}
@@ -919,6 +919,12 @@
 					},
 					"keyVaultUrl": {
 						"value": "[reference('keyVaultDeploy').outputs.KeyVaultUrl.value]"
+					},
+					"keyVaultName": {
+						"value": "[variables('keyVaultSettings').name]"
+					},
+					"rgName": {
+						"value": "[resourceGroup().name]"
 					},
 					"storageAccountName": {
 						"value": "[reference('storageDeploy').outputs.StorageAccountName.value]"
