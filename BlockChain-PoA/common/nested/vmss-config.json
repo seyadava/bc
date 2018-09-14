@@ -14,14 +14,8 @@
 		"consortiumDataUrl": {
 			"type": "string"
 		},
-		"scriptReqMode": {
-			"type": "string"
-		},
-		"scriptReqFileUri": {
-			"type": "string"
-		},
-		"scriptReqFilename": {
-			"type": "string"
+		"scriptReq": {
+			"type": "object"
 		},
 		"location": {
 			"type": "string"
@@ -81,7 +75,7 @@
 	},
 	"variables": {
 		"consortium-data": "[parameters('consortiumDataUrl')]",
-		"mode": "[parameters('scriptReqMode')]",
+		"mode": "[parameters('scriptReq').mode]",
 		"artifactsLocationURL": "[parameters('extensionSettings').artifactsLocationURL]",
 		"ethereumNetworkID": "[parameters('extensionSettings').ethereumNetworkID]",
 		"numBootNodes": "[parameters('extensionSettings').numBootNodes]",
@@ -111,11 +105,11 @@
 				"forceUpdateTag": "1.0",
 				"settings": {
 					"fileUris": [
-						"[parameters('scriptReqFileUri')]"
+						"[parameters('scriptReq').fileUri]"
 					]
 				},
 				"protectedSettings": {
-					"commandToExecute": "[concat('/bin/bash ', parameters('scriptReqFilename'), ' \"', variables('adminUsername'), '\" \"', variables('artifactsLocationURL'), '\" \"', variables('numBootNodes'), '\" \"', variables('numVLNodes'), '\" \"', variables('mode'), '\" \"', parameters('omsWorkspaceId'), '\" \"', parameters('omsPrimaryKey'), '\" \"', parameters('keyVaultUrl'), '\" \"', parameters('storageAccountName'), '\" \"', parameters('storagePrimaryKey'), '\" \"', parameters('ethRpcPort'), '\" \"', variables('adminSitePort'), '\" \"', variables('consortiumMemberId'), '\" \"', variables('ethereumNetworkID'),'\" \"', variables('adminId'),'\" \"', parameters('transactionPermissioningContract'),'\" \"',variables('consortium-data'),'\" \"',parameters('dockerRepository'),'\" \"',parameters('dockerLogin'),'\" \"',parameters('dockerPassword'),'\" \"',parameters('dockerImagePoaOrchestrator'),'\" \"',parameters('dockerImageEtheradmin'),'\" \"',parameters('dockerImageEthstat'),'\" \"',parameters('dockerImageValidator'), '\" \"',parameters('mustDeployVnetGateway'), '\" \"',variables('accessType'), '\" \"',variables('servicePrincipalId'), '\" \"',variables('servicePrincipalSecret'), '\" \"',variables('endpointFqdn'), '\" \"',variables('tenantId'), '\"')]"					
+					"commandToExecute": "[concat('/bin/bash ', parameters('scriptReq').filename, ' \"', variables('adminUsername'), '\" \"', variables('artifactsLocationURL'), '\" \"', variables('numBootNodes'), '\" \"', variables('numVLNodes'), '\" \"', variables('mode'), '\" \"', parameters('omsWorkspaceId'), '\" \"', parameters('omsPrimaryKey'), '\" \"', parameters('keyVaultUrl'), '\" \"', parameters('storageAccountName'), '\" \"', parameters('storagePrimaryKey'), '\" \"', parameters('ethRpcPort'), '\" \"', variables('adminSitePort'), '\" \"', variables('consortiumMemberId'), '\" \"', variables('ethereumNetworkID'),'\" \"', variables('adminId'),'\" \"', parameters('transactionPermissioningContract'),'\" \"',variables('consortium-data'),'\" \"',parameters('dockerRepository'),'\" \"',parameters('dockerLogin'),'\" \"',parameters('dockerPassword'),'\" \"',parameters('dockerImagePoaOrchestrator'),'\" \"',parameters('dockerImageEtheradmin'),'\" \"',parameters('dockerImageEthstat'),'\" \"',parameters('dockerImageValidator'), '\" \"',parameters('mustDeployVnetGateway'), '\" \"',variables('accessType'), '\" \"',variables('servicePrincipalId'), '\" \"',variables('servicePrincipalSecret'), '\" \"',variables('endpointFqdn'), '\" \"',variables('tenantId'), '\"')]"					
 				}
 			}
 		}
