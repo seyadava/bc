@@ -237,7 +237,7 @@ configure_endpoints()
 	sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
     az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
     az cloud set -n AzureStackCloud
-    az cloud update --profile 2017-03-09-profile
+    az cloud update --profile 2018-03-01-hybrid
 	az login --service-principal -u $SPN_APPID -p $SPN_KEY --tenant $AAD_TENANTID
 }
 
