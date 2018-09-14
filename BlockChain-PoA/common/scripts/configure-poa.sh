@@ -48,7 +48,7 @@ setup_dependencies()
 	sudo pip install certifi
 	loc=$(python -c "import certifi; print(certifi.where())");
 	sudo cat /var/lib/waagent/Certificates.pem >> $loc
-	sudo car /var/lib/waagent/Certificates.pem >> /opt/az/lib/python3.6/site-packages/certifi/cacert.pem
+	sudo cat /var/lib/waagent/Certificates.pem >> /opt/az/lib/python3.6/site-packages/certifi/cacert.pem
 }
 
 install_docker() {
@@ -231,6 +231,10 @@ is_poa_network_up() {
 
 configure_endpoints()
 {
+	sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+	sudo update-ca-certificates
+	export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+	sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
     az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
     az cloud set -n AzureStackCloud
     az cloud update --profile 2017-03-09-profile
