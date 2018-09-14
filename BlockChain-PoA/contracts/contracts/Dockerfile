@@ -35,6 +35,7 @@ RUN curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add
 RUN sudo sed -i -e "\$aAZURE_CORE_COLLECT_TELEMETRY=\"false\"" /etc/environment
 RUN sudo apt-get update && sudo apt-get install azure-cli
 
+
 # Bundle app scripts and java script files
 COPY orchestrator ./
 
@@ -53,6 +54,6 @@ RUN npm install
 RUN chmod +x bootstrap.sh
 RUN chmod +x orchestrate-poa.sh
 
-CMD ["sh", "-c", "bash bootstrap.sh ${NodeCount} ${MODE} ${KEY_VAULT_BASE_URL} ${STORAGE_ACCOUNT} ${CONTAINER_NAME} ${STORAGE_ACCOUNT_KEY} ${ETH_NETWORK_ID} ${VALIDATOR_ADMIN_ACCOUNT} ${CONSORTIUM_DATA_URL} ${ACCESS_TOKEN} ${CONFIG_LOG_FILE_PATH} ${TRANSACTION_PERMISSION_CONTRACT}"]
+CMD ["sh", "-c", "bash bootstrap.sh ${NodeCount} ${MODE} ${KEY_VAULT_BASE_URL} ${STORAGE_ACCOUNT} ${CONTAINER_NAME} ${STORAGE_ACCOUNT_KEY} ${ETH_NETWORK_ID} ${VALIDATOR_ADMIN_ACCOUNT} ${CONSORTIUM_DATA_URL} ${ACCESS_TOKEN} ${CONFIG_LOG_FILE_PATH} ${TRANSACTION_PERMISSION_CONTRACT} ${AAD_TENANTID} ${SPN_KEY} ${SPN_APPID} ${RG_NAME} ${KV_NAME}"]
 
 

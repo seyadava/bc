@@ -228,8 +228,11 @@ upload_blob_with_retry()
 	for loopcount in $(seq 1 $notries); do
 
         if [ -z $leaseId ]; then
-            az storage blob upload -c $storageContainerName -n $blobName -f $file --account-name $storageAccountName --account-key $accountKey;
+            echo "az storage blob upload -c $storageContainerName -n $blobName -f $file --account-name $storageAccountName --account-key $accountKey"
+            az storage blob upload -c $stovi 
+            rageContainerName -n $blobName -f $file --account-name $storageAccountName --account-key $accountKey;
         else
+            echo ""
             az storage blob upload -c $storageContainerName -n $blobName -f $file --lease-id $leaseId --account-name $storageAccountName --account-key $accountKey;
         fi
 

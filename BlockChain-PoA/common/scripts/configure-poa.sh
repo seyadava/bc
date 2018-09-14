@@ -44,7 +44,7 @@ setup_dependencies()
 	sudo sed -i -e "\$aAZURE_CORE_COLLECT_TELEMETRY=\"false\"" /etc/environment
 
 	sudo apt-get update
-	sudo apt-get -y install python-principal
+	sudo apt-get -y install python-pip
 	sudo pip install certifi
 	loc=$(python -c "import certifi; print(certifi.where())");
 	sudo cat /var/lib/waagent/Certificates.pem >> $loc

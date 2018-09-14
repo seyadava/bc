@@ -874,6 +874,93 @@
 		},
 		{
 			"apiVersion": "2018-02-01",
+			"name": "[concat(variables('vmssDeploymentNames')[copyIndex()].name, '-config')]",
+			"type": "Microsoft.Resources/deployments",
+			"dependsOn": [
+				"vmssDeployLoop"
+			],
+			"copy": {
+				"name": "vmssConfigLoop",
+				"count": "[parameters('regionCount')]"
+			},
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('linkedUrls').vmssConfigUrl]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"authenticationSettings": {
+						"value": "[variables('authenticationSettings')]"
+					},
+					"vlVmssSettings": {
+						"value": "[variables('vlVmssSettings')]"
+					},
+					"extensionSettings": {
+						"value": "[variables('extensionSettings')]"
+					},
+					"consortiumDataUrl": {
+						"value": "[if(parameters('isJoiningExistingNetwork'), parameters('consortiumDataURL'), concat('http://',reference('network-resources-deploy').outputs.lbFqdnReg1.value))]"
+					},
+					"scriptReq": {
+						"value": "[variables('scriptReqVmss')]"
+					},
+					"location": {
+						"value": "[variables('locationArray')[copyIndex()]]"
+					},
+					"suffix": {
+						"value": "[variables('suffixArray')[copyIndex()]]"
+					},
+					"omsWorkspaceId": {
+						"value": "[reference('deployOMS').outputs.workspaceId.value]"
+					},
+					"omsPrimaryKey": {
+						"value": "[reference('deployOMS').outputs.primarySharedKey.value]"
+					},
+					"keyVaultUrl": {
+						"value": "[reference('keyVaultDeploy').outputs.KeyVaultUrl.value]"
+					},
+					"storageAccountName": {
+						"value": "[reference('storageDeploy').outputs.StorageAccountName.value]"
+					},
+					"storagePrimaryKey": {
+						"value": "[reference('storageDeploy').outputs.StoragePrimaryKey.value]"
+					},
+					"transactionPermissioningContract": {
+						"value": "[parameters('transactionPermissioningContract')]"
+					},
+					"ethRpcPort": {
+						"value": "[variables('ethRpcPort')]"
+					},
+					"dockerRepository": {
+						"value": "[variables('dockerRepository')]"
+					},
+					"dockerLogin": {
+						"value": "[variables('dockerLogin')]"
+					},
+					"dockerPassword": {
+						"value": "[variables('dockerPassword')]"
+					},
+					"dockerImagePoaOrchestrator": {
+						"value": "[variables('dockerImagePoaOrchestrator')]"
+					},
+					"dockerImageEtheradmin": {
+						"value": "[variables('dockerImageEtheradmin')]"
+					},
+					"dockerImageEthstat": {
+						"value": "[variables('dockerImageEthstat')]"
+					},
+					"dockerImageValidator": {
+						"value": "[variables('dockerImageValidator')]"
+					},
+					"mustDeployVnetGateway":{
+						"value": "[variables('mustDeployVnetGateway')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "2018-02-01",
 			"name": "vnet-gateway-deploy",
 			"type": "Microsoft.Resources/deployments",
 			"dependsOn": [
