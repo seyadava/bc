@@ -42,13 +42,6 @@ setup_dependencies()
 	# Configure azure-cli to not log telemetry due to issues with telemetry upload processes not finishing
 	# https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest#cli-configuration-values-and-environment-variables
 	sudo sed -i -e "\$aAZURE_CORE_COLLECT_TELEMETRY=\"false\"" /etc/environment
-
-	sudo apt-get update
-	sudo apt-get -y install python-pip
-	sudo pip install certifi
-	loc=$(python -c "import certifi; print(certifi.where())");
-	sudo cat /var/lib/waagent/Certificates.pem >> $loc
-	sudo cat /var/lib/waagent/Certificates.pem >> /opt/az/lib/python3.6/site-packages/certifi/cacert.pem
 }
 
 install_docker() {
@@ -71,7 +64,7 @@ install_docker() {
 	echo "=========== Finished installing docker engine."
 }
 
-# Retry Command
+# Retry Command`
 # $1 : Command which run for  
 # $2 : Error Message when the command($1) failed for $NOOFTRIES times
 command_with_retry()
@@ -229,12 +222,18 @@ is_poa_network_up() {
     if [ $(wc -l < $POA_NETWORK_UPFILE) -lt 1 ]; then echo 0; else echo 1; fi
 }
 
+setup_cli_certificates()
+{
+	if [ "$ACCESS_TYPE" = "SPN" ]; then
+		sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+		sudo update-ca-certificates
+		export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+		sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
+	fi
+}
+
 configure_endpoints()
 {
-	sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
-	sudo update-ca-certificates
-	export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-	sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
     az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
     az cloud set -n AzureStackCloud
     az cloud update --profile 2018-03-01-hybrid
@@ -353,6 +352,11 @@ wget_with_retry "${ARTIFACTS_URL_PREFIX}/scripts/run-validator.sh";
 ################################################
 cd "$HOMEDIR";
 setup_dependencies
+
+################################################
+# Copy required certificates for Azure CLI
+################################################
+setup_cli_certificates
 
 ################################################
 # Configure Cloud Endpoints in Azure CLI

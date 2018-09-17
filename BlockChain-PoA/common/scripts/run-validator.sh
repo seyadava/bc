@@ -55,7 +55,7 @@ start_node()
 
     keyVaultUrl="$PASSPHRASE_URI?api-version=2016-10-01";
     
-    if [ $AUTH_TYPE -eq "spn" ]; then
+    if [ "$ACCESS_TYPE" = "SPN" ]; then
         accessToken=$(get_access_token_spn "$ENDPOINTS_FQDN" "$SPN_APPID" "$SPN_KEY" "$AAD_TENANTID");
     else
         accessToken=$(get_access_token);

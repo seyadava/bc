@@ -36,13 +36,16 @@ set_secret_in_keyvault()
     az login --service-principal -u $spnAppId -p $spnKey --tenant $aadTenantId
     az keyvault create -n $kvName -g $rgName
 
-    # url="$vaultBaseUrl/secrets/$secretName?api-version=2016-10-01"
-    # data="{\"value\": \"${secretValue}\"}"
-    
-    # setSecretResponse=$(curl -X PUT $url -d "$data" -H "Content-Type: application/json" -H "Authorization: Bearer $accessToken");    
-    # secretUri=$(echo $setSecretResponse | jq -r ".id");
-    setSecretResponse=$(az keyvault secret set -n $secretName --vault-name $kvName --value $secretValue);
-    secretUri=$(echo $setSecretResponse | jq -r ".id");
+    if [ -z $spnKey]; then 
+        url="$vaultBaseUrl/secrets/$secretName?api-version=2016-10-01"
+        data="{\"value\": \"${secretValue}\"}"
+        
+        setSecretResponse=$(curl -X PUT $url -d "$data" -H "Content-Type: application/json" -H "Authorization: Bearer $accessToken");    
+        secretUri=$(echo $setSecretResponse | jq -r ".id");
+    else 
+        setSecretResponse=$(az keyvault secret set -n $secretName --vault-name $kvName --value $secretValue);
+        secretUri=$(echo $setSecretResponse | jq -r ".id");
+    fi
     echo $secretUri;
 }
 
