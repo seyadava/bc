@@ -95,6 +95,16 @@ acquire_lease_on_container()
     storageAccountName=$2
     accountKey=$3
 
+	################################################
+	# Copy required certificates for Azure CLI
+	################################################
+	setup_cli_certificates
+
+	################################################
+	# Configure Cloud Endpoints in Azure CLI
+	################################################
+	configure_endpoints
+
     az storage container create --name $containerName --account-name $storageAccountName --account-key $accountKey --fail-on-exist;
     if [ $? -ne 0 ]; then
         echo "Attempt to create the lease container on storage account has failed." >> $CONFIG_LOG_FILE_PATH;

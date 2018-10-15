@@ -269,7 +269,7 @@
 		"servicePrincipalId": 
 		{
 			"type": "string",
-			"defaultValue": "7def3ae7-992a-492e-88fe-94e2053e74c7",
+			"defaultValue": "454c6c39-2ff0-4342-8ed5-8450af307701",
 			"metadata": {
 				"description": "Optional - Service principal ID for environments that do not support MSI."
 			}
@@ -277,7 +277,7 @@
 		"servicePrincipalSecret": 
 		{
 			"type": "string",
-			"defaultValue": "f9eilhdz/hr8GDIwc39uSxfwo+e+6eoV6wCoJrb8TBU=",
+			"defaultValue": "sJIJGsiO+nO3FLDN76FFEMluGRaB3dqSRODKFtmhHgI=",
 			"metadata": {
 				"description": "Optional - Service principal secret for environments that do not support MSI."
 			}
@@ -293,7 +293,7 @@
 		"tenantId": 
 		{
 			"type": "string",
-			"defaultValue": "8272fdc6-5ec8-4aed-b10c-c09e3221910c",
+			"defaultValue": "73103a66-894e-4622-8ca7-da73c5c00c0b",
 			"metadata": {
 				"description": "The name or ID or the AAD tenant. (e.g. mydomain.onmicrosoft.com)."
 			}
