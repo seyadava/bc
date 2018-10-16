@@ -244,6 +244,12 @@ setup_cli_certificates()
 
 configure_endpoints()
 {
+	if [ "$ACCESS_TYPE" = "SPN" ]; then
+		sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+		sudo update-ca-certificates
+		export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+		sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
+	fi
     az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
     az cloud set -n AzureStackCloud
     az cloud update --profile 2018-03-01-hybrid
@@ -332,7 +338,7 @@ sudo chmod -R g+w $STATS_LOG_PATH
 #####################################################################################
 # Constants
 #####################################################################################
-CONTAINER_NAME="poa-config"
+CONTAINER_NAME="poa-config1"
 HOMEDIR="/home/$AZUREUSER";
 LEASE_ID="";
 NOOFTRIES=5
