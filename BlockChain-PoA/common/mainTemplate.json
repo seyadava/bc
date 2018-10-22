@@ -269,7 +269,7 @@
 		"servicePrincipalId": 
 		{
 			"type": "string",
-			"defaultValue": "7def3ae7-992a-492e-88fe-94e2053e74c7",
+			"defaultValue": "386182ed-4386-46f9-8326-bb2bd73258f2",
 			"metadata": {
 				"description": "Optional - Service principal ID for environments that do not support MSI."
 			}
@@ -277,7 +277,7 @@
 		"servicePrincipalSecret": 
 		{
 			"type": "string",
-			"defaultValue": "f9eilhdz/hr8GDIwc39uSxfwo+e+6eoV6wCoJrb8TBU=",
+			"defaultValue": "PfGap3LKWqWFivWBDP1BZOX5+yp799Rnej6AAu+BGp0=",
 			"metadata": {
 				"description": "Optional - Service principal secret for environments that do not support MSI."
 			}
@@ -285,7 +285,7 @@
 		"endpointFqdn": 
 		{
 			"type": "string",
-			"defaultValue": "redmond.ext-n22r1002.masd.stbtest.microsoft.com",
+			"defaultValue": "redmond.ext-n42r2101.masd.stbtest.microsoft.com",
 			"metadata": {
 				"description": "The FQDN of the Azure Stack environemt. (e.g. local.azurestack.external)."
 			}
@@ -293,7 +293,7 @@
 		"tenantId": 
 		{
 			"type": "string",
-			"defaultValue": "8272fdc6-5ec8-4aed-b10c-c09e3221910c",
+			"defaultValue": "0a9c9a9e-2774-489f-8560-bae5824f8b46",
 			"metadata": {
 				"description": "The name or ID or the AAD tenant. (e.g. mydomain.onmicrosoft.com)."
 			}
@@ -325,7 +325,7 @@
 		"dockerImagePoaOrchestrator": 
 		{
 			"type": "string",
-			"defaultValue": "orchestrator:latest18",
+			"defaultValue": "orchestrator:latest32",
 			"metadata": {
 				"description": "Docker Orchestrator repository"
 			}
@@ -333,7 +333,7 @@
 		"dockerImageEtheradmin": 
 		{
 			"type": "string",
-			"defaultValue": "etheradmin:latest18",
+			"defaultValue": "etheradmin:latest32",
 			"metadata": {
 				"description": "Docker EtherAdmin repository"
 			}
@@ -341,7 +341,7 @@
 		"dockerImageEthstat": 
 		{
 			"type": "string",
-			"defaultValue": "ethstat:latest18",
+			"defaultValue": "ethstat:latest32",
 			"metadata": {
 				"description": "Docker Ethstat repository"
 			}
@@ -349,7 +349,7 @@
 		"dockerImageValidator": 
 		{
 			"type": "string",
-			"defaultValue": "validator:latest18",
+			"defaultValue": "validator:latest32",
 			"metadata": {
 				"description": "Docker Validator repository"
 			}
