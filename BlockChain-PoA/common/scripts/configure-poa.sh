@@ -388,6 +388,9 @@ wget_with_retry "${ARTIFACTS_URL_PREFIX}/scripts/run-validator.sh";
 cd "$HOMEDIR";
 setup_dependencies
 
+# Add user to docker group and install docker
+sudo usermod -aG docker ${USER}
+install_docker
 ################################################
 # Copy required certificates for Azure CLI
 ################################################
@@ -397,10 +400,6 @@ setup_cli_certificates
 # Configure Cloud Endpoints in Azure CLI
 ################################################
 configure_endpoints
-
-# Add user to docker group and install docker
-sudo usermod -aG docker ${USER}
-install_docker
 sudo -u $AZUREUSER /bin/bash -c "mkdir -p $ETHERADMIN_HOME/public";
 download_docker_images
 

@@ -52,7 +52,7 @@ configure_endpoints()
 alreadyLoggedEthStatWarning=0;
 
 start_ethstat() {
-    if [[ -z "$OMS_WORKSPACE_ID" ]]; 
+    if [ -z "$OMS_WORKSPACE_ID" -a "$ACCESS_TYPE" != "SPN" ]; 
     then
         if [ $alreadyLoggedEthStatWarning -eq 0 ];
         then
@@ -143,7 +143,7 @@ is_etheradmin_up(){
 
 is_ethstat_up(){
     id=$(sudo docker ps | grep '-ethstat' | awk '{print $1}');
-    if [ ! -z $id ]; then echo 1; else echo 0; fi
+    if [ ! -z "$id" -a "$ACCESS_TYPE" = "SPN" ]; then echo 1; else echo 0; fi
 }
 
 ####################################################################################
