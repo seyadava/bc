@@ -36,7 +36,7 @@ set_secret_in_keyvault()
     az login --service-principal -u $spnAppId -p $spnKey --tenant $aadTenantId
     az keyvault create -n $kvName -g $rgName
 
-    if [ -z $spnKey]; then 
+    if [ -z $spnKey ]; then 
         url="$vaultBaseUrl/secrets/$secretName?api-version=2016-10-01"
         data="{\"value\": \"${secretValue}\"}"
         
