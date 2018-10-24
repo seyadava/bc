@@ -11,9 +11,7 @@
 #set -x
 
 start_parity_devmode_rpc() {
-	echo "ALIIIIIIIIIIIIIIIIII-1" >> "$CONFIG_LOG_FILE_PATH"
 	parity --chain dev --base-path "$DEV_PARITY_DIRECTORY" --jsonrpc-apis "eth,net,web3,personal,parity,parity_accounts" >> "$CONFIG_LOG_FILE_PATH" 2>&1 &
-	echo "ALIIIIIIIIIIIIIIIIII-2" >> "$CONFIG_LOG_FILE_PATH"
 	if [ $? -ne 0 ]; then unsuccessful_exit "Failed to start parity node in dev mode." 25; fi
 	echo "===== Started parity in dev mode =====";
 	sleep 10;

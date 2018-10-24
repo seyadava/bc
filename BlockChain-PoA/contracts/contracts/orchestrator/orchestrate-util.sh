@@ -148,7 +148,8 @@ upload_uri_to_blob()
     
     # Create json file and put the passphrase uri in the file
     json='{"passphraseUri": "'$passphraseUri'"}'
-	echo $json > $uriFile
+	echo $json
+    echo $json > $uriFile
 
     # Upload json file to blob and remove the file from working directory 
     uploadAttempts=3

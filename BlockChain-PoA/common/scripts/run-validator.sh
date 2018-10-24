@@ -90,6 +90,9 @@ start_node()
     if [ -z $PASSPHRASE_URI ]; then
         unsuccessful_exit "Unable to start validator node. Passphrase url should not be empty." 40
     fi
+    echo "8888888888888888888888"
+    echo $PASSPHRASE_URI
+    echo "8888888888888888888888"
 
     keyVaultUrl="$PASSPHRASE_URI?api-version=2016-10-01";
     
@@ -98,11 +101,15 @@ start_node()
     else
         accessToken=$(get_access_token);
     fi
+    
+    echo "=========================="
+    echo $accessToken
+    echo "=========================="
 
     keyVaultResponse=$(curl $keyVaultUrl -H "Content-Type: application/json" -H "Authorization: Bearer $accessToken");
     echo "Get KeyVault secret response: $keyVaultResponse";
     passphrase=$(echo $keyVaultResponse | jq -r ".value");
-    if [ -z $passphrase ]; then
+    if [ -zaz  $passphrase ]; then
         unsuccessful_exit "Unable to start validator node. Passphrase should not be empty." 41
     fi
 
