@@ -131,13 +131,13 @@ for i in `seq 0 $(($NodeCount - 1))`; do
 	echo "KV_NAME= $KV_NAME" >> "$CONFIG_LOG_FILE_PATH"
 	passphraseUri=$(set_secret_in_keyvault "$KEY_VAULT_BASE_URL" "passphrase-$i" "$passphrase" "$ACCESS_TOKEN" "$AAD_TENANTID" "$SPN_KEY" "$SPN_APPID" "$RG_NAME" "$KV_NAME" );
 	
-	if [ -z $passphraseUri ]; then
+	if [ -z "$passphraseUri" ]; then
 		unsuccessful_exit "Unable to set a secret for passphrase in azure KeyVault." 23;
 	fi
 	upload_uri_to_blob $STORAGE_ACCOUNT $CONTAINER_NAME $STORAGE_ACCOUNT_KEY "passphrase-$i.json" $passphraseUri
 
 	# Keep track of generated address for injecting to smart contract and for admin approval
-	if [ -z $ADDRESS_LIST ]; then
+	if [ -z "$ADDRESS_LIST" ]; then
 		ADDRESS_LIST="\"$address\"";
 		ADDRESS_LIST_FOR_CONTRACT="address($address)";
 	else

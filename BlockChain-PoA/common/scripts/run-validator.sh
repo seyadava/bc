@@ -173,11 +173,11 @@ CONSORTIUM_DATA_URL=${11}
 MUST_DEPLOY_GATEWAY=${12}
 
 # Hybrid environment arguments
-ACCESS_TYPE=${26}
-ENDPOINTS_FQDN=${27}
-SPN_APPID=${28}
-SPN_KEY=${29}
-AAD_TENANTID=${30}
+ACCESS_TYPE=${13}
+ENDPOINTS_FQDN=${14}
+SPN_APPID=${15}
+SPN_KEY=${16}
+AAD_TENANTID=${17}
 
 # Echo out the parameters
 echo "--- configure-validator.sh starting up ---"
