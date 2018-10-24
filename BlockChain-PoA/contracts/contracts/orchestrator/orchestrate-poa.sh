@@ -30,7 +30,7 @@ shutdown_parity()
 
 setup_cli_certificates()
 {
-	if [ "$ACCESS_TYPE" = "SPN" ]; then
+	if [ ! -z $SPN_APPID ]; then
 		sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
 		sudo update-ca-certificates
 		export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
