@@ -106,7 +106,7 @@ start_node()
         unsuccessful_exit "Unable to start validator node. Passphrase should not be empty." 41
     fi
 
-    sudo docker run -d -v $PARITY_DATA_PATH:$PARITY_DATA_PATH -v $HOMEDIR:$HOMEDIR -v $DEPLOYMENT_LOG_PATH:$DEPLOYMENT_LOG_PATH -v $PARITY_LOG_PATH:$PARITY_LOG_PATH -e AZUREUSER=$AZUREUSER -e STORAGE_ACCOUNT=$STORAGE_ACCOUNT -e CONTAINER_NAME=$CONTAINER_NAME -e STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY -e ADMINID=$ADMINID -e NUM_BOOT_NODES=$NUM_BOOT_NODES -e RPC_PORT=$RPC_PORT -e PASSPHRASE=$passphrase -e PASSPHRASE_FILE_NAME=$blobname -e PASSPHRASE_URI=$PASSPHRASE_URI -e MODE=$MODE -e LEASE_ID=$LEASE_ID -e CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL -e MUST_DEPLOY_GATEWAY=$MUST_DEPLOY_GATEWAY -e CONFIG_LOG_FILE_PATH=$CONFIG_LOG_FILE_PATH -e PARITY_LOG_FILE_PATH=$PARITY_LOG_FILE_PATH --network host --restart on-failure $DOCKER_IMAGE_VALIDATOR 
+    sudo docker run -d -v $PARITY_DATA_PATH:$PARITY_DATA_PATH -v $HOMEDIR:$HOMEDIR -v $DEPLOYMENT_LOG_PATH:$DEPLOYMENT_LOG_PATH -v $PARITY_LOG_PATH:$PARITY_LOG_PATH -v $CERTIFICATE_PATH:$CERTIFICATE_PATH -e AZUREUSER=$AZUREUSER -e STORAGE_ACCOUNT=$STORAGE_ACCOUNT -e CONTAINER_NAME=$CONTAINER_NAME -e STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY -e ADMINID=$ADMINID -e NUM_BOOT_NODES=$NUM_BOOT_NODES -e RPC_PORT=$RPC_PORT -e PASSPHRASE=$passphrase -e PASSPHRASE_FILE_NAME=$blobname -e PASSPHRASE_URI=$PASSPHRASE_URI -e MODE=$MODE -e LEASE_ID=$LEASE_ID -e CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL -e MUST_DEPLOY_GATEWAY=$MUST_DEPLOY_GATEWAY -e CONFIG_LOG_FILE_PATH=$CONFIG_LOG_FILE_PATH -e PARITY_LOG_FILE_PATH=$PARITY_LOG_FILE_PATH --network host --restart on-failure $DOCKER_IMAGE_VALIDATOR 
     if [ $? -ne 0 ]; then
         unsuccessful_exit "Unable to run docker image $VALIDATOR_DOCKER_IMAGE." 42;
     fi
@@ -134,6 +134,24 @@ stop_node()
 
 	echo "Stopped validator node.";
     reset_state;
+}
+
+setup_cli_certificates()
+{
+	if [ "$ACCESS_TYPE" = "SPN" ]; then
+		sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+		sudo update-ca-certificates
+		export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+		sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
+	fi
+}
+
+configure_endpoints()
+{
+    az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
+    az cloud set -n AzureStackCloud
+    az cloud update --profile 2018-03-01-hybrid
+	az login --service-principal -u $SPN_APPID -p $SPN_KEY --tenant $AAD_TENANTID
 }
 
 ####################################################################################
@@ -201,6 +219,7 @@ PASSPHRASE_URI="";
 PARITY_VOLUME="/opt/parity";
 POA_NETWORK_UPFILE="$HOMEDIR/networkup.txt";
 PARITY_DATA_PATH="/opt/parity"
+CERTIFICATE_PATH="/var/lib/waagent/"
 PARITY_LOG_FILE_PATH="/var/log/parity/parity.log"
 PARITY_IPC_PATH="/opt/parity/jsonrpc.ipc"
 PARITY_LOG_PATH="/var/log/parity"
