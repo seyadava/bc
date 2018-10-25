@@ -109,7 +109,7 @@ start_node()
     keyVaultResponse=$(curl $keyVaultUrl -H "Content-Type: application/json" -H "Authorization: Bearer $accessToken");
     echo "Get KeyVault secret response: $keyVaultResponse";
     passphrase=$(echo $keyVaultResponse | jq -r ".value");
-    if [ -zaz  $passphrase ]; then
+    if [ -z  $passphrase ]; then
         unsuccessful_exit "Unable to start validator node. Passphrase should not be empty." 41
     fi
 
