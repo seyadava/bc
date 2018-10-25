@@ -100,7 +100,7 @@ start_admin_website(){
 # Starts a validator node. 
 run_validator()
 {
-    sudo -u $AZUREUSER /bin/bash /home/$AZUREUSER/run-validator.sh "$AZUREUSER" "$NODE_COUNT" "$STORAGE_ACCOUNT" "$CONTAINER_NAME" "$STORAGE_ACCOUNT_KEY" "$ADMINID" "$NUM_BOOT_NODES" "$RPC_PORT" "$MODE" "$VALIDATOR_DOCKER_IMAGE" "$CONSORTIUM_DATA_URL" "$MUST_DEPLOY_GATEWAY" "$ACCESS_TYPE" "$ENDPOINTS_FQDN" "$SPN_APPID" "$SPN_KEY" "$AAD_TENANTID" >> $CONFIG_LOG_FILE_PATH 2>&1 & 
+    sudo -u $AZUREUSER /bin/bash /home/$AZUREUSER/run-validator.sh "$AZUREUSER" "$NODE_COUNT" "$STORAGE_ACCOUNT" "$CONTAINER_NAME" "$STORAGE_ACCOUNT_KEY" "$ADMINID" "$NUM_BOOT_NODES" "$RPC_PORT" "$MODE" "$VALIDATOR_DOCKER_IMAGE" "$CONSORTIUM_DATA_URL" "$MUST_DEPLOY_GATEWAY" "$ACCESS_TYPE" "$ENDPOINTS_FQDN" "$SPN_APPID" "$SPN_KEY" "$AAD_TENANTID" "$RG_NAME" >> $CONFIG_LOG_FILE_PATH 2>&1 & 
 }
 
 join_leaders_network() {
@@ -180,6 +180,7 @@ ENDPOINTS_FQDN=${24}
 SPN_APPID=${25}
 SPN_KEY=${26}
 AAD_TENANTID=${27}
+RG_NAME=${28}
 
 # Echo out the parameters
 echo "--- configure-validator.sh starting up ---"
@@ -209,6 +210,7 @@ echo "ENDPOINTS_FQDN=$ENDPOINTS_FQDN"
 echo "SPN_APPID=$SPN_APPID"
 echo "SPN_KEY=$SPN_KEY"
 echo "AAD_TENANTID=$AAD_TENANTID"
+echo "RG_NAME=$VMSS_PUBLIC_IP"
 
 #####################################################################################
 # Log Folder Locations

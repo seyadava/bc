@@ -11,6 +11,20 @@ unsuccessful_exit()
   exit $2;
 }
 
+configure_endpoints()
+{
+    
+    sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+    sudo update-ca-certificates
+    export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+    sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
+	
+    az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
+    az cloud set -n AzureStackCloud
+    az cloud update --profile 2018-03-01-hybrid
+	az login --service-principal -u $SPN_APPID -p $SPN_KEY --tenant $AAD_TENANTID
+}
+
 # Upload a blob to azure storage
 upload_blob_with_retry()
 {
@@ -205,7 +219,12 @@ run_parity()
 
     if [[ $MUST_DEPLOY_GATEWAY == "False" ]]; then
         # Look up the assigned public ip for this VMSS instance using Azure "Instance Metadata Service"
-        local publicIp=$(curl -s -H Metadata:true http://169.254.169.254/metadata/instance?api-version=2017-04-02 | jq -r .network.interface[0].ipv4.ipAddress[0].publicIpAddress);
+        if [ "$ACCESS_TYPE" = "SPN" ]; then
+            local publicIp=$(curl -s -H Metadata:true http://169.254.169.254/metadata/instance?api-version=2017-04-02 | jq -r .network.interface[0].ipv4.ipAddress[0].publicIpAddress);
+        else
+            configure_endpoints
+            local publicIp=$(az network public-ip list -g $RG_NAME -o json | jq '.[0]' | jq -r ".ipAddress")
+        fi
         echo "Public IP: " ${publicIp};
         sed -i s/#EXTERNALIP#/$publicIp/ $CONFIGDIR/node.toml;
     else
@@ -252,6 +271,12 @@ LEASE_ID=${12}
 CONSORTIUM_DATA_URL=${13}
 MUST_DEPLOY_GATEWAY=${14}
 PARITY_LOG_FILE_PATH=${15}
+ACCESS_TYPE=${16}
+ENDPOINTS_FQDN=${17}
+SPN_APPID=${18}
+SPN_KEY=${19}
+AAD_TENANTID=${20}
+RG_NAME=${21}
 
 # Constants
 NOOFTRIES=3;
