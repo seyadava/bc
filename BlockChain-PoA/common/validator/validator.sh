@@ -11,6 +11,20 @@ unsuccessful_exit()
   exit $2;
 }
 
+configure_endpoints()
+{
+    
+    sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+    sudo update-ca-certificates
+    export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+    sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
+	
+    az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
+    az cloud set -n AzureStackCloud
+    az cloud update --profile 2018-03-01-hybrid
+	az login --service-principal -u $SPN_APPID -p $SPN_KEY --tenant $AAD_TENANTID
+}
+
 # Upload a blob to azure storage
 upload_blob_with_retry()
 {
@@ -24,10 +38,15 @@ upload_blob_with_retry()
 	
     success=0
 	for loopcount in $(seq 1 $notries); do
-
         if [ -z $leaseId ]; then
+            if [ "$ACCESS_TYPE" != "SPN" ]; then
+                configure_endpoints
+            fi
             az storage blob upload -c $storageContainerName -n $blobName -f $file --account-name $storageAccountName --account-key $accountKey;
         else
+            if [ "$ACCESS_TYPE" != "SPN" ]; then
+                configure_endpoints
+            fi
             az storage blob upload -c $storageContainerName -n $blobName -f $file --lease-id $leaseId --account-name $storageAccountName --account-key $accountKey;
         fi
 
@@ -125,6 +144,9 @@ add_enode_to_boot_nodes_file() {
 # Add discovered node to parity and append the enode url to bootnodes file
 add_parity_reserved_peer() {
     filename=$1;
+    if [ "$ACCESS_TYPE" != "SPN" ]; then
+        configure_endpoints
+    fi
     az storage blob download -c $CONTAINER_NAME -n "$filename"  -f "$CONFIGDIR/$filename" --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY;
     if [ $? -ne 0 ]; then
         echo "Failed to download lease blob $filename." # no need to retry here since we attempt until NUM_BOOT_NODES has been discovered
@@ -147,7 +169,9 @@ add_parity_reserved_peer() {
 
 # Discover other nodes in the network and connect to them with parity_addReservedPeer api
 discover_nodes() {
-
+    if [ "$ACCESS_TYPE" != "SPN" ]; then
+        configure_endpoints
+    fi
     # Get list of active validator node lease blobs
     leaseBlobs=$(az storage blob list --query '[?properties.lease.state==`leased`].name' -c $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY );
     echo $leaseBlobs > activenodes.json;
@@ -205,7 +229,7 @@ run_parity()
 
     if [[ $MUST_DEPLOY_GATEWAY == "False" ]]; then
         # Look up the assigned public ip for this VMSS instance using Azure "Instance Metadata Service"
-        if [ -z "$IP_ADDRESS" ]; then
+        if [ "$ACCESS_TYPE" != "SPN" ]; then
             local publicIp=$(curl -s -H Metadata:true http://169.254.169.254/metadata/instance?api-version=2017-04-02 | jq -r .network.interface[0].ipv4.ipAddress[0].publicIpAddress);
         else
             local publicIp=$IP_ADDRESS
@@ -257,6 +281,11 @@ CONSORTIUM_DATA_URL=${13}
 MUST_DEPLOY_GATEWAY=${14}
 PARITY_LOG_FILE_PATH=${15}
 IP_ADDRESS=${16}
+ENDPOINTS_FQDN=${17}
+SPN_APPID=${18}
+SPN_KEY=${19}
+AAD_TENANTID=${20}
+IP_ADDRESS=${21}
 
 
 echo "AZUREUSER=$AZUREUSER"
@@ -274,6 +303,11 @@ echo "LEASE_ID=$LEASE_ID"
 echo "CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL"
 echo "MUST_DEPLOY_GATEWAY=$MUST_DEPLOY_GATEWAY"
 echo "PARITY_LOG_FILE_PATH=$PARITY_LOG_FILE_PATH"
+echo "ACCESS_TYPE=$ACCESS_TYPE"
+echo "ENDPOINTS_FQDN=$ENDPOINTS_FQDN"
+echo "SPN_APPID=$SPN_APPID"
+echo "SPN_KEY=$SPN_KEY"
+echo "AAD_TENANTID=$AAD_TENANTID"
 echo "IP_ADDRESS=$IP_ADDRESS"
 
 # Constants
