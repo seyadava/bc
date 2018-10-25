@@ -85,6 +85,7 @@ renew_lease()
 start_node()
 {
     blobname=$1;
+    ipAddress=""
     # Get passphrase from KeyVault and store it in password file
     PASSPHRASE_URI=$(cat "$CONFIGDIR/$blobname" | jq -r ".passphraseUri");
     if [ -z $PASSPHRASE_URI ]; then
@@ -98,6 +99,7 @@ start_node()
     
     if [ "$ACCESS_TYPE" = "SPN" ]; then
         accessToken=$(get_access_token_spn "$ENDPOINTS_FQDN" "$SPN_APPID" "$SPN_KEY" "$AAD_TENANTID");
+        ipAddress=$(get_ip_address "$RG_NAME");
     else
         accessToken=$(get_access_token);
     fi
@@ -106,6 +108,10 @@ start_node()
     echo $accessToken
     echo "=========================="
 
+    echo "***************************"
+    echo $ipAddress
+    echo "***************************"
+
     keyVaultResponse=$(curl $keyVaultUrl -H "Content-Type: application/json" -H "Authorization: Bearer $accessToken");
     echo "Get KeyVault secret response: $keyVaultResponse";
     passphrase=$(echo $keyVaultResponse | jq -r ".value");
@@ -113,7 +119,7 @@ start_node()
         unsuccessful_exit "Unable to start validator node. Passphrase should not be empty." 41
     fi
 
-    sudo docker run -d -v $PARITY_DATA_PATH:$PARITY_DATA_PATH -v $HOMEDIR:$HOMEDIR -v $DEPLOYMENT_LOG_PATH:$DEPLOYMENT_LOG_PATH -v $PARITY_LOG_PATH:$PARITY_LOG_PATH -v $CERTIFICATE_PATH:$CERTIFICATE_PATH -e AZUREUSER=$AZUREUSER -e STORAGE_ACCOUNT=$STORAGE_ACCOUNT -e CONTAINER_NAME=$CONTAINER_NAME -e STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY -e ADMINID=$ADMINID -e NUM_BOOT_NODES=$NUM_BOOT_NODES -e RPC_PORT=$RPC_PORT -e PASSPHRASE=$passphrase -e PASSPHRASE_FILE_NAME=$blobname -e PASSPHRASE_URI=$PASSPHRASE_URI -e MODE=$MODE -e LEASE_ID=$LEASE_ID -e CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL -e MUST_DEPLOY_GATEWAY=$MUST_DEPLOY_GATEWAY -e CONFIG_LOG_FILE_PATH=$CONFIG_LOG_FILE_PATH -e PARITY_LOG_FILE_PATH=$PARITY_LOG_FILE_PATH -e ACCESS_TYPE=$ACCESS_TYPE -e ENDPOINTS_FQDN=$ENDPOINTS_FQDN -e SPN_APPID=$SPN_APPID -e SPN_KEY=$SPN_KEY -e AAD_TENANTID=$AAD_TENANTID -e RG_NAME=$RG_NAME --network host --restart on-failure $DOCKER_IMAGE_VALIDATOR
+    sudo docker run -d -v $PARITY_DATA_PATH:$PARITY_DATA_PATH -v $HOMEDIR:$HOMEDIR -v $DEPLOYMENT_LOG_PATH:$DEPLOYMENT_LOG_PATH -v $PARITY_LOG_PATH:$PARITY_LOG_PATH -v $CERTIFICATE_PATH:$CERTIFICATE_PATH -e AZUREUSER=$AZUREUSER -e STORAGE_ACCOUNT=$STORAGE_ACCOUNT -e CONTAINER_NAME=$CONTAINER_NAME -e STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY -e ADMINID=$ADMINID -e NUM_BOOT_NODES=$NUM_BOOT_NODES -e RPC_PORT=$RPC_PORT -e PASSPHRASE=$passphrase -e PASSPHRASE_FILE_NAME=$blobname -e PASSPHRASE_URI=$PASSPHRASE_URI -e MODE=$MODE -e LEASE_ID=$LEASE_ID -e CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL -e MUST_DEPLOY_GATEWAY=$MUST_DEPLOY_GATEWAY -e CONFIG_LOG_FILE_PATH=$CONFIG_LOG_FILE_PATH -e PARITY_LOG_FILE_PATH=$PARITY_LOG_FILE_PATH -e IP_ADDRESS=$ipAddress --network host --restart on-failure $DOCKER_IMAGE_VALIDATOR
     if [ $? -ne 0 ]; then
         unsuccessful_exit "Unable to run docker image $VALIDATOR_DOCKER_IMAGE." 42;
     fi
@@ -222,7 +228,7 @@ CONFIGDIR="$HOMEDIR/config";
 PASSPHRASE_FILE_NAME="";
 LEASE_ID="";
 RENEW_INTERVAL_IN_SECS=10;
-LEASE_DURATION_IN_SECS=30;
+LEASE_DURATION_IN_SECS=60;
 BOOT_NODES_FILE="$HOMEDIR/bootnodes.txt";
 PASSPHRASE_URI="";
 PARITY_VOLUME="/opt/parity";

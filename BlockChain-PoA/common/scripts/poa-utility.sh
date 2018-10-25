@@ -20,6 +20,12 @@ unsuccessful_exit()
   exit $2;
 }
 
+get_ip_address()
+{
+	rgName=$1
+    local publicIp=$(az network public-ip list -g $rgName -o json | jq '.[0]' | jq -r ".ipAddress")
+}
+
 # Use MSI to get access token for authenticating to azure key vault 
 get_access_token()
 {
