@@ -20,6 +20,17 @@ unsuccessful_exit()
   exit $2;
 }
 
+grant_keyvault_access()
+{
+    spnAppId=$1
+    spnKey=$2
+    aadTenantId=$3
+    kvName=$4
+    rgName=$5
+    az login --service-principal -u $spnAppId -p $spnKey --tenant $aadTenantId
+    az keyvault create -n $kvName -g $rgName
+}
+
 # Stores secret in key vault.
 set_secret_in_keyvault()
 {
@@ -33,11 +44,11 @@ set_secret_in_keyvault()
     rgName=$8
     kvName=$9
 
-    if [ ! -z $spnKey ]; then 
-        az login --service-principal -u $spnAppId -p $spnKey --tenant $aadTenantId
-        az keyvault create -n $kvName -g $rgName
-    fi
-    
+    # if [ ! -z $spnKey ]; then 
+    #     az login --service-principal -u $spnAppId -p $spnKey --tenant $aadTenantId
+    #     az keyvault create -n $kvName -g $rgName
+    # fi
+
     # if [ -z $spnKey ]; then 
     url="$vaultBaseUrl/secrets/$secretName?api-version=2016-10-01"
     data="{\"value\": \"${secretValue}\"}"
