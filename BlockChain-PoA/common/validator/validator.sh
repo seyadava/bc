@@ -219,7 +219,7 @@ run_parity()
 
     if [[ $MUST_DEPLOY_GATEWAY == "False" ]]; then
         # Look up the assigned public ip for this VMSS instance using Azure "Instance Metadata Service"
-        if [ "$ACCESS_TYPE" = "SPN" ]; then
+        if [ "$ACCESS_TYPE" != "SPN" ]; then
             local publicIp=$(curl -s -H Metadata:true http://169.254.169.254/metadata/instance?api-version=2017-04-02 | jq -r .network.interface[0].ipv4.ipAddress[0].publicIpAddress);
         else
             configure_endpoints
@@ -277,6 +277,29 @@ SPN_APPID=${18}
 SPN_KEY=${19}
 AAD_TENANTID=${20}
 RG_NAME=${21}
+
+
+echo "AZUREUSER=$AZUREUSER"
+echo "STORAGE_ACCOUNT=$STORAGE_ACCOUNT"
+echo "CONTAINER_NAME=$CONTAINER_NAME"
+echo "STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY"
+echo "ADMINID=$ADMINID"
+echo "NUM_BOOT_NODES=$NUM_BOOT_NODES"
+echo "RPC_PORT=$RPC_PORT"
+echo "PASSPHRASE=$PASSPHRASE"
+echo "PASSPHRASE_FILE_NAME=$PASSPHRASE_FILE_NAME"
+echo "PASSPHRASE_URI=$PASSPHRASE_URI"
+echo "MODE=$MODE"
+echo "LEASE_ID=$LEASE_ID"
+echo "CONSORTIUM_DATA_URL=$CONSORTIUM_DATA_URL"
+echo "MUST_DEPLOY_GATEWAY=$MUST_DEPLOY_GATEWAY"
+echo "PARITY_LOG_FILE_PATH=$PARITY_LOG_FILE_PATH"
+echo "ACCESS_TYPE=$ACCESS_TYPE"
+echo "ENDPOINTS_FQDN=$ENDPOINTS_FQDN"
+echo "SPN_APPID=$SPN_APPID"
+echo "SPN_KEY=$SPN_KEY"
+echo "AAD_TENANTID=$AAD_TENANTID"
+echo "RG_NAME=$RG_NAME"
 
 # Constants
 NOOFTRIES=3;
