@@ -22,8 +22,11 @@ unsuccessful_exit()
 
 get_ip_address()
 {
+	echo "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
 	rgName=$1
-    local publicIp=$(az network public-ip list -g $rgName -o json | jq '.[0]' | jq -r ".ipAddress")
+    publicIp=$(az network public-ip list -g $rgName -o json | jq '.[0]' | jq -r ".ipAddress")
+
+	echo $publicIp;
 }
 
 # Use MSI to get access token for authenticating to azure key vault 
