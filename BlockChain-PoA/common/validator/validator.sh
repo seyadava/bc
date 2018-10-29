@@ -39,9 +39,7 @@ upload_blob_with_retry()
     accountKey=$5;
     leaseId=$6;
     notries=$7;
-	echo "(((((((((((((((((((((((((((("
-    echo "UPLOAAAAAAAAAD"
-    echo ")))))))))))))))))))))))))))"
+	
     success=0
 	for loopcount in $(seq 1 $notries); do
         if [ -z $leaseId ]; then
@@ -168,7 +166,7 @@ add_parity_reserved_peer() {
 # Discover other nodes in the network and connect to them with parity_addReservedPeer api
 discover_nodes() {
     # Get list of active validator node lease blobs
-    leaseBlobs=$(    );
+    leaseBlobs=$(az storage blob list --query '[?properties.lease.state==`leased`].name' -c $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY );
     echo $leaseBlobs > activenodes.json;
 
     # Download lease blob and retrieve the enode url ( if available ) for each active node
@@ -316,7 +314,6 @@ RPC_PORT_WAIT_IN_SECS=15;
 POA_NETWORK_UPFILE="$HOMEDIR/networkup.txt";
 PASSWORD_FILE="$HOMEDIR/node.pwd";
 PARITY_IPC_PATH="/opt/parity/jsonrpc.ipc"
-CERTIFICATE_PATH="/var/lib/waagent/"
 
 ################################################
 # Copy required certificates for Azure CLI
