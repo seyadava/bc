@@ -11,14 +11,18 @@ unsuccessful_exit()
   exit $2;
 }
 
+setup_cli_certificates()
+{
+	if [ ! -z $SPN_APPID ]; then
+		sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
+		sudo update-ca-certificates
+		export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+		sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
+	fi
+}
+
 configure_endpoints()
 {
-    
-    sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
-    sudo update-ca-certificates
-    export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-    sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
-	
     az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
     az cloud set -n AzureStackCloud
     az cloud update --profile 2018-03-01-hybrid
@@ -35,18 +39,14 @@ upload_blob_with_retry()
     accountKey=$5;
     leaseId=$6;
     notries=$7;
-	
+	echo "(((((((((((((((((((((((((((("
+    echo "UPLOAAAAAAAAAD"
+    echo ")))))))))))))))))))))))))))"
     success=0
 	for loopcount in $(seq 1 $notries); do
         if [ -z $leaseId ]; then
-            if [ "$ACCESS_TYPE" != "SPN" ]; then
-                configure_endpoints
-            fi
             az storage blob upload -c $storageContainerName -n $blobName -f $file --account-name $storageAccountName --account-key $accountKey;
         else
-            if [ "$ACCESS_TYPE" != "SPN" ]; then
-                configure_endpoints
-            fi
             az storage blob upload -c $storageContainerName -n $blobName -f $file --lease-id $leaseId --account-name $storageAccountName --account-key $accountKey;
         fi
 
@@ -116,9 +116,10 @@ get_address_from_phrase()
 
 # Appends enode url of the current node to azure storage blob
 publish_enode_url() {
-
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-9-1"
     enodeUrl=$(invoke_parity_jsonipc_method "parity_enode" "[]" 0 | jq -r ".result");
-
+    echo $enodeUrl
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-9-2"
     if [[ $enodeUrl =~ ^enode ]]; then
         hostname=$(hostname);
         echo "{\"passphraseUri\": \"${PASSPHRASE_URI}\", \"enodeUrl\": \"${enodeUrl}\", \"hostname\": \"$hostname\"}" > nodeid.json;
@@ -144,9 +145,6 @@ add_enode_to_boot_nodes_file() {
 # Add discovered node to parity and append the enode url to bootnodes file
 add_parity_reserved_peer() {
     filename=$1;
-    if [ "$ACCESS_TYPE" != "SPN" ]; then
-        configure_endpoints
-    fi
     az storage blob download -c $CONTAINER_NAME -n "$filename"  -f "$CONFIGDIR/$filename" --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY;
     if [ $? -ne 0 ]; then
         echo "Failed to download lease blob $filename." # no need to retry here since we attempt until NUM_BOOT_NODES has been discovered
@@ -169,9 +167,6 @@ add_parity_reserved_peer() {
 
 # Discover other nodes in the network and connect to them with parity_addReservedPeer api
 discover_nodes() {
-    if [ "$ACCESS_TYPE" != "SPN" ]; then
-        configure_endpoints
-    fi
     # Get list of active validator node lease blobs
     leaseBlobs=$(az storage blob list --query '[?properties.lease.state==`leased`].name' -c $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY );
     echo $leaseBlobs > activenodes.json;
@@ -217,13 +212,14 @@ run_parity()
     echo $PASSPHRASE > $PASSWORD_FILE;
 
     # Inject engine signer address and admin id to node.toml
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-1"
     address=$(get_address_from_phrase $PASSPHRASE $PARITY_LOG_FILE_PATH);
     if [ -z $address ]; then
         unsuccessful_exit "Unable to generate validator address from passphrase." 55
     else
         echo "Engine signer: $address";
     fi
-
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-2"
     sed s/#ENGINE_SIGNER/$address/ $HOMEDIR/node.toml > $HOMEDIR/node1.toml;
     sed s/#ETH_RPC_PORT/$RPC_PORT/ $HOMEDIR/node1.toml > $CONFIGDIR/node.toml;
 
@@ -240,23 +236,23 @@ run_parity()
         # Delete the external IP line
         sed -i /#EXTERNALIP#/d $CONFIGDIR/node.toml;
     fi
-
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-3"
     # Cleanup temp files
     rm -f node1.toml;
-    
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-4"
     echo "Starting parity on validator node..."
     parity --config $CONFIGDIR/node.toml --force-ui -lclient,sync,discovery,engine,poa,shutdown,chain,executive=debug >> $PARITY_LOG_FILE_PATH 2>&1 &
-    
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-5"
     # Allow time for the Parity client to start
     sleep $RPC_PORT_WAIT_IN_SECS; # Wait for RPC port to open
     
     sudo chown :adm $PARITY_IPC_PATH;
     sudo chmod -R g+w $PARITY_IPC_PATH;
-
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-6"
     # Run tasks
     publish_enode_url;
     set_ExtraData $ADMINID
-
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-7"
     if [ "$MODE" == "Member" ]; then  add_emote_peers; fi
 }
 
@@ -320,6 +316,16 @@ RPC_PORT_WAIT_IN_SECS=15;
 POA_NETWORK_UPFILE="$HOMEDIR/networkup.txt";
 PASSWORD_FILE="$HOMEDIR/node.pwd";
 PARITY_IPC_PATH="/opt/parity/jsonrpc.ipc"
+
+################################################
+# Copy required certificates for Azure CLI
+################################################
+setup_cli_certificates
+
+################################################
+# Configure Cloud Endpoints in Azure CLI
+################################################
+configure_endpoints
 
 # start validator node
 run_parity
