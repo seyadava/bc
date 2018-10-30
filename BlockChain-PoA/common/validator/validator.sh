@@ -145,40 +145,40 @@ publish_enode_url() {
 
 add_enode_to_boot_nodes_file() {
     local enodeUrl=$1;
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-11-1"
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-11-1" >> /var/log/deployment/config.log
      # Only write to the file when a new boot node is found
     if [ ! -z $(grep "$enodeUrl" "$BOOT_NODES_FILE") ]; then 
-        echo "ALLIIIIIIIIIIIIIIIIIIIII-11-2"
+        echo "ALLIIIIIIIIIIIIIIIIIIIII-11-2" >> /var/log/deployment/config.log
         echo "enode already exists in boot node file: $enode";
     else
-        echo "ALLIIIIIIIIIIIIIIIIIIIII-11-3"
+        echo "ALLIIIIIIIIIIIIIIIIIIIII-11-3" >> /var/log/deployment/config.log
         echo $enodeUrl >> $BOOT_NODES_FILE;
     fi
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-11-4"
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-11-4" >> /var/log/deployment/config.log
 }
 
 # Add discovered node to parity and append the enode url to bootnodes file
 add_parity_reserved_peer() {
     filename=$1;
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-10-1"
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-10-1" >> /var/log/deployment/config.log
     az storage blob download -c $CONTAINER_NAME -n "$filename"  -f "$CONFIGDIR/$filename" --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY;
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-10-2"
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-10-2" >> /var/log/deployment/config.log
     if [ $? -ne 0 ]; then
         echo "Failed to download lease blob $filename." # no need to retry here since we attempt until NUM_BOOT_NODES has been discovered
     else
-        echo "ALLIIIIIIIIIIIIIIIIIIIII-10-3"
+        echo "ALLIIIIIIIIIIIIIIIIIIIII-10-3" >> /var/log/deployment/config.log
         enodeUrl=$(cat "$CONFIGDIR/$filename" | jq -r ".enodeUrl");
         echo "Discovered node with enode url: $enodeUrl";
         if [[ $enodeUrl =~ ^enode ]]; then
-            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-4"
+            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-4" >> /var/log/deployment/config.log
             invoke_parity_jsonipc_method "parity_addReservedPeer" '["'$enodeUrl'"]' 0
-            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-5"
+            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-5" >> /var/log/deployment/config.log
             if [ $? -ne 0 ]; then
                 unsuccessful_exit "Failed to add bootnode to parity." 54
             fi
-            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-6"
+            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-6" >> /var/log/deployment/config.log
             add_enode_to_boot_nodes_file $enodeUrl;
-            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-7"
+            echo "ALLIIIIIIIIIIIIIIIIIIIII-10-7" >> /var/log/deployment/config.log
         else
             echo "enode url value invalid."
         fi
@@ -189,28 +189,27 @@ add_parity_reserved_peer() {
 # Discover other nodes in the network and connect to them with parity_addReservedPeer api
 discover_nodes() {
     # Get list of active validator node lease blobs
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-8-2"
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-8-2" >> /var/log/deployment/config.log
     leaseBlobs=$(az storage blob list --query '[?properties.lease.state==`leased`].name' -c $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY );
     echo $leaseBlobs > activenodes.json;
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-8-3"
+    echo "ALLIIIIIIIIIIIIIIIIIIIII-8-3" >> /var/log/deployment/config.log
     # Download lease blob and retrieve the enode url ( if available ) for each active node
     jq -c '.[]' activenodes.json | while read file; do
-        echo "ALLIIIIIIIIIIIIIIIIIIIII-8-4"
+        echo "ALLIIIIIIIIIIIIIIIIIIIII-8-4" >> /var/log/deployment/config.log
         leaseBlobName=$(echo $file | tr -d '"');
         echo "=========================="
         echo $leaseBlobName
         echo $PASSPHRASE_FILE_NAME
         echo "=========================="
-        echo "ALLIIIIIIIIIIIIIIIIIIIII-8-5"
+        echo "ALLIIIIIIIIIIIIIIIIIIIII-8-5" >> /var/log/deployment/config.log
         if [ "$PASSPHRASE_FILE_NAME" != "$leaseBlobName"  ]; then  # skip if lease is for current node
-            echo "ALLIIIIIIIIIIIIIIIIIIIII-8-6"
+            echo "ALLIIIIIIIIIIIIIIIIIIIII-8-6" >> /var/log/deployment/config.log
             add_parity_reserved_peer $leaseBlobName;
         fi
     done
 }
 
 discover_more_nodes() {
-    echo "ALLIIIIIIIIIIIIIIIIIIIII-81"
     if [ $(wc -l < $BOOT_NODES_FILE) -lt $NUM_BOOT_NODES ]; then echo 1; else echo 0; fi
 }
 
