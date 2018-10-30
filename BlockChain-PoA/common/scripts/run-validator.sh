@@ -31,16 +31,6 @@ configure_endpoints()
 # Iterate through lease records and attempt to acquire a new lease
 acquire_lease()
 {
-    ################################################
-    # Copy required certificates for Azure CLI
-    ################################################
-    setup_cli_certificates
-
-    ################################################
-    # Configure Cloud Endpoints in Azure CLI
-    ################################################
-    configure_endpoints
-
     leaseId="";
 
     # TODO: List blobs and iterate through instead of iterating through downloaded files
@@ -62,16 +52,6 @@ acquire_lease()
 # Renew an existing lease
 renew_lease()
 {
-    ################################################
-    # Copy required certificates for Azure CLI
-    ################################################
-    setup_cli_certificates
-
-    ################################################
-    # Configure Cloud Endpoints in Azure CLI
-    ################################################
-    configure_endpoints
-
     az storage blob lease renew --blob-name $PASSPHRASE_FILE_NAME --container-name $CONTAINER_NAME --lease-id $LEASE_ID --account-name $STORAGE_ACCOUNT --account-key $STORAGE_ACCOUNT_KEY > /dev/null;
     if [ $? -ne 0 ]; then
         echo "Attempt to renew lease with lease id $LEASE_ID failed."
@@ -136,24 +116,6 @@ stop_node()
 
 	echo "Stopped validator node.";
     reset_state;
-}
-
-setup_cli_certificates()
-{
-	if [ "$ACCESS_TYPE" = "SPN" ]; then
-		sudo cp /var/lib/waagent/Certificates.pem /usr/local/share/ca-certificates/azsCertificate.crt
-		sudo update-ca-certificates
-		export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-		sudo sed -i -e "\$aREQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" /etc/environment
-	fi
-}
-
-configure_endpoints()
-{
-    az cloud register -n AzureStackCloud --endpoint-resource-manager "https://management.$ENDPOINTS_FQDN" --suffix-storage-endpoint "$ENDPOINTS_FQDN" --suffix-keyvault-dns ".vault.$ENDPOINTS_FQDN"
-    az cloud set -n AzureStackCloud
-    az cloud update --profile 2018-03-01-hybrid
-	az login --service-principal -u $SPN_APPID -p $SPN_KEY --tenant $AAD_TENANTID
 }
 
 ####################################################################################
@@ -227,6 +189,16 @@ CERTIFICATE_PATH="/var/lib/waagent/"
 PARITY_LOG_FILE_PATH="/var/log/parity/parity.log"
 PARITY_IPC_PATH="/opt/parity/jsonrpc.ipc"
 PARITY_LOG_PATH="/var/log/parity"
+
+################################################
+# Copy required certificates for Azure CLI
+################################################
+setup_cli_certificates
+
+################################################
+# Configure Cloud Endpoints in Azure CLI
+################################################
+configure_endpoints
 
 reset_state;
 
