@@ -112,8 +112,21 @@ get_address_from_phrase()
     echo $address;
 }
 
+renew_lease()
+{
+    blobName=$1;
+    storageAccountName=$2;
+    storageContainerName=$3;
+    accountKey=$4;
+    leaseId=$5;
+
+    echo "RENEWWWW======================"
+    az storage blob lease renew -b $blobName -c $storageContainerName --lease-id $leaseId --account-name $storageAccountName --account-key $accountKey
+}
+
 # Appends enode url of the current node to azure storage blob
 publish_enode_url() {
+    renew_lease $PASSPHRASE_FILE_NAME $STORAGE_ACCOUNT $CONTAINER_NAME $STORAGE_ACCOUNT_KEY $LEASE_ID
     echo "ALLIIIIIIIIIIIIIIIIIIIII-9-1"
     enodeUrl=$(invoke_parity_jsonipc_method "parity_enode" "[]" 0 | jq -r ".result");
     echo $enodeUrl
