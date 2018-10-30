@@ -202,10 +202,10 @@ discover_nodes() {
         echo $PASSPHRASE_FILE_NAME
         echo "=========================="
         echo "ALLIIIIIIIIIIIIIIIIIIIII-8-5" >> /var/log/deployment/config.log
-        if [ "$PASSPHRASE_FILE_NAME" != "$leaseBlobName"  ]; then  # skip if lease is for current node
+        # if [ "$PASSPHRASE_FILE_NAME" != "$leaseBlobName"  ]; then  # skip if lease is for current node
             echo "ALLIIIIIIIIIIIIIIIIIIIII-8-6" >> /var/log/deployment/config.log
             add_parity_reserved_peer $leaseBlobName;
-        fi
+        #fi
     done
 }
 
