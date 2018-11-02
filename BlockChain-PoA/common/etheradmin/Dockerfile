@@ -16,15 +16,20 @@ ENV valSetContractBlobName ""
 ENV adminContractBlobName ""
 ENV adminContractABIBlobName ""
 ENV adminSiteLogFile ""
+ENV storageDnsSuffix ""
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY package*.json ./
 
+# Update package utility
+RUN apt-get -y update
+RUN apt-get -y install npm
+
 RUN npm install -g
 
 # Bundle app source
 COPY . .
 
-CMD ["sh", "-c", "node etheradmin.js ${listenPort} ${consortiumId} ${azureStorageAccount} ${azureStorageAccessKey} ${containerName} ${identityBlobPrefix} ${ethRpcPort} ${validatorListBlobName} ${paritySpecBlobName} ${valSetContractBlobName} ${adminContractBlobName} ${adminContractABIBlobName} ${adminSiteLogFile}"]
+CMD ["sh", "-c", "node etheradmin.js ${listenPort} ${consortiumId} ${azureStorageAccount} ${azureStorageAccessKey} ${containerName} ${identityBlobPrefix} ${ethRpcPort} ${validatorListBlobName} ${paritySpecBlobName} ${valSetContractBlobName} ${adminContractBlobName} ${adminContractABIBlobName} ${adminSiteLogFile} ${storageDnsSuffix}"]
