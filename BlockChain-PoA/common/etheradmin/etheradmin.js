@@ -24,8 +24,9 @@ var paritySpecBlobName = process.argv[10];
 var valSetContractBlobName = process.argv[11];
 var adminContractBlobName = process.argv[12];
 var adminContractABIBlobName = process.argv[13];
-var logFilePath=process.argv[14]
-process.env['AZURE_STORAGE_DNS_SUFFIX'] = process.argv[15]
+var logFilePath=process.argv[14];
+process.env['AZURE_STORAGE_DNS_SUFFIX'] = process.argv[15];
+process.env['AZURE_STORAGE_API_VERSION'] = process.argv[16];
 
 /*
  * Constants

@@ -85,13 +85,16 @@ start_admin_website(){
        sudo docker kill $cid
     fi
 
-    if [ "$ACCESS_TYPE" = "SPN" ]; then
-        STORAGE_DNS_SUFFIX=$ENDPOINTS_FQDN
-    else
-        STORAGE_DNS_SUFFIX="core.windows.net"
-    fi
+    #if [ "$ACCESS_TYPE" = "SPN" ]; then
+    #    STORAGE_DNS_SUFFIX=$ENDPOINTS_FQDN
+    #else
+    #    STORAGE_DNS_SUFFIX="core.windows.net"
+    #fi
+    
+    STORAGE_DNS_SUFFIX=$ENDPOINTS_FQDN
+    STORAGE_API_VERSION="2017-04-17"
 
-    containerId=$(sudo docker run -d -v $ADMINSITE_LOG_PATH:$ADMINSITE_LOG_PATH -v $PARITY_VOLUME:$PARITY_VOLUME -v $ETHERADMIN_HOME/public:/usr/src/app/share -e NODE_ENV=production -e listenPort="$ADMIN_SITE_PORT" -e consortiumId="$CONSORTIUM_MEMBER_ID" -e azureStorageAccount="$STORAGE_ACCOUNT" -e azureStorageAccessKey="$STORAGE_ACCOUNT_KEY" -e containerName="$CONTAINER_NAME" -e identityBlobPrefix="$BLOB_NAME_PREFIX" -e ethRpcPort="$RPC_PORT" -e validatorListBlobName="$VALIDATOR_LIST_BLOB_NAME" -e paritySpecBlobName="$PARITY_SPEC_BLOB_NAME" -e valSetContractBlobName="$VALSET_CONTRACT_BLOB_NAME" -e adminContractBlobName="$ADMIN_CONTRACT_BLOB_NAME" -e adminContractABIBlobName="$ADMIN_CONTRACT_ABI_BLOB_NAME" -e adminSiteLogFile="$ADMINSITE_LOG_FILE" -e storageDnsSuffix="$STORAGE_DNS_SUFFIX" --network host $ETHERADMIN_DOCKER_IMAGE);
+    containerId=$(sudo docker run -d -v $ADMINSITE_LOG_PATH:$ADMINSITE_LOG_PATH -v $PARITY_VOLUME:$PARITY_VOLUME -v $ETHERADMIN_HOME/public:/usr/src/app/share -e NODE_ENV=production -e listenPort="$ADMIN_SITE_PORT" -e consortiumId="$CONSORTIUM_MEMBER_ID" -e azureStorageAccount="$STORAGE_ACCOUNT" -e azureStorageAccessKey="$STORAGE_ACCOUNT_KEY" -e containerName="$CONTAINER_NAME" -e identityBlobPrefix="$BLOB_NAME_PREFIX" -e ethRpcPort="$RPC_PORT" -e validatorListBlobName="$VALIDATOR_LIST_BLOB_NAME" -e paritySpecBlobName="$PARITY_SPEC_BLOB_NAME" -e valSetContractBlobName="$VALSET_CONTRACT_BLOB_NAME" -e adminContractBlobName="$ADMIN_CONTRACT_BLOB_NAME" -e adminContractABIBlobName="$ADMIN_CONTRACT_ABI_BLOB_NAME" -e adminSiteLogFile="$ADMINSITE_LOG_FILE" -e AZURE_STORAGE_DNS_SUFFIX="$STORAGE_DNS_SUFFIX" -e AZURE_STORAGE_API_VERSION="$STORAGE_API_VERSION" --network host $ETHERADMIN_DOCKER_IMAGE);
     if [ $? -ne 0 ]; then
         unsuccessful_exit "Unable to run docker image $ETHADMIN_DOCKER_IMAGE." 32;
     fi
