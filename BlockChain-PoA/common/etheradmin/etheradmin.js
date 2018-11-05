@@ -28,6 +28,10 @@ var logFilePath=process.argv[14];
 process.env['AZURE_STORAGE_DNS_SUFFIX'] = process.argv[15];
 process.env['AZURE_STORAGE_API_VERSION'] = process.argv[16];
 
+console.log("====================================")
+console.log(process.env['AZURE_STORAGE_DNS_SUFFIX'])
+console.log(process.env['AZURE_STORAGE_API_VERSION'])
+console.log("====================================")
 /*
  * Constants
  */
