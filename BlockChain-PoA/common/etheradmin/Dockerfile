@@ -18,6 +18,8 @@ ENV adminContractABIBlobName ""
 ENV adminSiteLogFile ""
 ENV storageDnsSuffix ""
 ENV storageApiVersion ""
+ENV AZURE_STORAGE_API_VERSION ${storageApiVersion}
+ENV AZURE_STORAGE_DNS_SUFFIX ${storageDnsSuffix}
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
