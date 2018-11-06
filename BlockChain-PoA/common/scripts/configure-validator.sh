@@ -94,7 +94,7 @@ start_admin_website(){
     STORAGE_DNS_SUFFIX=$ENDPOINTS_FQDN
     STORAGE_API_VERSION="2017-04-17"
 
-    containerId=$(sudo docker run -d -v "/var/lib/waagent/":"/var/lib/waagent/" -v $ADMINSITE_LOG_PATH:$ADMINSITE_LOG_PATH -v $PARITY_VOLUME:$PARITY_VOLUME -v $ETHERADMIN_HOME/public:/usr/src/app/share -e NODE_ENV=production -e listenPort="$ADMIN_SITE_PORT" -e consortiumId="$CONSORTIUM_MEMBER_ID" -e azureStorageAccount="$STORAGE_ACCOUNT" -e azureStorageAccessKey="$STORAGE_ACCOUNT_KEY" -e containerName="$CONTAINER_NAME" -e identityBlobPrefix="$BLOB_NAME_PREFIX" -e ethRpcPort="$RPC_PORT" -e validatorListBlobName="$VALIDATOR_LIST_BLOB_NAME" -e paritySpecBlobName="$PARITY_SPEC_BLOB_NAME" -e valSetContractBlobName="$VALSET_CONTRACT_BLOB_NAME" -e adminContractBlobName="$ADMIN_CONTRACT_BLOB_NAME" -e adminContractABIBlobName="$ADMIN_CONTRACT_ABI_BLOB_NAME" -e adminSiteLogFile="$ADMINSITE_LOG_FILE" -e AZURE_STORAGE_DNS_SUFFIX="$STORAGE_DNS_SUFFIX" -e AZURE_STORAGE_API_VERSION="$STORAGE_API_VERSION" -e NODE_EXTRA_CA_CERTS="/var/lib/waagent/Certificates.pem" --network host $ETHERADMIN_DOCKER_IMAGE);
+    containerId=$(sudo docker run -d -v "/var/lib/waagent/":"/var/lib/waagent/" -v $ADMINSITE_LOG_PATH:$ADMINSITE_LOG_PATH -v $PARITY_VOLUME:$PARITY_VOLUME -v $ETHERADMIN_HOME/public:/usr/src/app/share -e NODE_ENV=production -e listenPort="$ADMIN_SITE_PORT" -e consortiumId="$CONSORTIUM_MEMBER_ID" -e azureStorageAccount="$STORAGE_ACCOUNT" -e azureStorageAccessKey="$STORAGE_ACCOUNT_KEY" -e containerName="$CONTAINER_NAME" -e identityBlobPrefix="$BLOB_NAME_PREFIX" -e ethRpcPort="$RPC_PORT" -e validatorListBlobName="$VALIDATOR_LIST_BLOB_NAME" -e paritySpecBlobName="$PARITY_SPEC_BLOB_NAME" -e valSetContractBlobName="$VALSET_CONTRACT_BLOB_NAME" -e adminContractBlobName="$ADMIN_CONTRACT_BLOB_NAME" -e adminContractABIBlobName="$ADMIN_CONTRACT_ABI_BLOB_NAME" -e adminSiteLogFile="$ADMINSITE_LOG_FILE" -e storageDnsSuffix="$STORAGE_DNS_SUFFIX" -e storageApiVersion="$STORAGE_API_VERSION" -e userCert="$CERT_FILE" --network host $ETHERADMIN_DOCKER_IMAGE);
     if [ $? -ne 0 ]; then
         unsuccessful_exit "Unable to run docker image $ETHADMIN_DOCKER_IMAGE." 32;
     fi
@@ -228,6 +228,7 @@ PARITY_LOG_PATH="/var/log/parity"
 ADMINSITE_LOG_PATH="/var/log/adminsite"
 STATS_LOG_PATH="/var/log/stats"
 DEPLOYMENT_LOG_PATH="/var/log/deployment"
+CERT_FILE="/var/lib/waagent/Certificates.pem"
 CONFIG_LOG_FILE_PATH="$DEPLOYMENT_LOG_PATH/config.log";
 ADMINSITE_LOG_FILE="$ADMINSITE_LOG_PATH/etheradmin.log"
 ETHSTAT_LOG_FILE="$STATS_LOG_PATH/ethstat.log"
