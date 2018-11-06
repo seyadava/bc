@@ -19,8 +19,8 @@ ENV adminSiteLogFile ""
 ENV storageDnsSuffix ""
 ENV storageApiVersion ""
 ENV userCert ""
-ENV NODE_EXTRA_CA_CERTS "/var/lib/waagent/Certificates.pem"
-ENV AZURE_STORAGE_DNS_SUFFIX "redmond.ext-n22r1002.masd.stbtest.microsoft.com"
+ENV NODE_EXTRA_CA_CERTS ${userCert}
+ENV AZURE_STORAGE_DNS_SUFFIX ${storageDnsSuffix}
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -39,6 +39,9 @@ RUN apt-get -y install npm
 RUN npm install git+https://github.com/seyadava/azure-storage-node.git
 
 RUN npm install -g
+
+RUN export NODE_EXTRA_CA_CERTS=${userCert}
+RUN export AZURE_STORAGE_DNS_SUFFIX=${storageDnsSuffix}
 
 # Bundle app source
 COPY . .
