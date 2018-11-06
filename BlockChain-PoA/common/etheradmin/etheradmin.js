@@ -27,6 +27,7 @@ var adminContractABIBlobName = process.argv[13];
 var logFilePath=process.argv[14];
 process.env['AZURE_STORAGE_DNS_SUFFIX'] = process.argv[15];
 process.env['AZURE_STORAGE_API_VERSION'] = process.argv[16];
+process.env['NODE_EXTRA_CA_CERTS'] = process.argv[17];
 
 /*
  * Constants
@@ -93,7 +94,8 @@ console.log(`adminContractABIBlobName: ${adminContractABIBlobName}`)
 console.log(`Started EtherAdmin website - Ver.${appjson.version}`);
 console.log("====================================");
 console.log(`${process.env['AZURE_STORAGE_DNS_SUFFIX']}`);
-console.log(`${process.env['AZURE_STORAGE_API_VERSION']}`)
+console.log(`${process.env['AZURE_STORAGE_API_VERSION']}`);
+console.log(`${process.env['NODE_EXTRA_CA_CERTS']}`);
 console.log("====================================")
 
 

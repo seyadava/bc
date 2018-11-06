@@ -19,8 +19,8 @@ ENV adminSiteLogFile ""
 ENV storageDnsSuffix ""
 ENV storageApiVersion ""
 ENV AZURE_STORAGE_API_VERSION ${storageApiVersion}
-ENV AZURE_STORAGE_DNS_SUFFIX ${storageDnsSuffix}}
-ENV NODE_EXTRA_CA_CERTS "/usr/local/share/ca-certificates/azsCertificate.crt"
+ENV AZURE_STORAGE_DNS_SUFFIX ${storageDnsSuffix}
+ENV NODE_EXTRA_CA_CERTS ${userCert}
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
@@ -42,4 +42,4 @@ RUN npm install -g
 # Bundle app source
 COPY . .
 
-CMD ["sh", "-c", "node etheradmin.js ${listenPort} ${consortiumId} ${azureStorageAccount} ${azureStorageAccessKey} ${containerName} ${identityBlobPrefix} ${ethRpcPort} ${validatorListBlobName} ${paritySpecBlobName} ${valSetContractBlobName} ${adminContractBlobName} ${adminContractABIBlobName} ${adminSiteLogFile} ${storageDnsSuffix} ${storageApiVersion}"]
+CMD ["sh", "-c", "node etheradmin.js ${listenPort} ${consortiumId} ${azureStorageAccount} ${azureStorageAccessKey} ${containerName} ${identityBlobPrefix} ${ethRpcPort} ${validatorListBlobName} ${paritySpecBlobName} ${valSetContractBlobName} ${adminContractBlobName} ${adminContractABIBlobName} ${adminSiteLogFile} ${storageDnsSuffix} ${storageApiVersion} ${userCert}"]
