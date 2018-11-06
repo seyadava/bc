@@ -19,6 +19,8 @@ ENV adminSiteLogFile ""
 ENV storageDnsSuffix ""
 ENV storageApiVersion ""
 ENV userCert ""
+ENV NODE_EXTRA_CA_CERTS "/var/lib/waagent/Certificates.pem"
+ENV AZURE_STORAGE_DNS_SUFFIX "redmond.ext-n22r1002.masd.stbtest.microsoft.com"
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
