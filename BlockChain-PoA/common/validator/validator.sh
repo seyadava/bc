@@ -251,7 +251,7 @@ run_parity()
     # Run tasks
     publish_enode_url;
     set_ExtraData $ADMINID
-    if [ "$MODE" == "Member" ]; then  add_emote_peers; fi
+    if [ "$MODE" == "Member" ]; then  add_remote_peers; fi
 }
 
 ####################################################################################
