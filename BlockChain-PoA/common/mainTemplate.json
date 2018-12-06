@@ -4,7 +4,7 @@
 	"parameters": {
 		"location": {
 			"type": "string",
-			"defaultValue": "redmond",
+			"defaultValue": "[resourceGroup().location]",
 			"metadata": {
 				"description": "Resource group location for current deployment"
 			}
@@ -32,7 +32,7 @@
 		},
 		"location_1": {
 			"type": "string",
-			"defaultValue": "redmond",
+			"defaultValue": "[resourceGroup().location]",
 			"metadata": {
 				"description": "Select the first region."
 			}
@@ -78,7 +78,7 @@
 		},
 		"adminUsername": {
 			"type": "string",
-			"defaultValue": "adminuser",
+			"defaultValue": "",
 			"metadata": {
 				"description": "Administrator username of each deployed VM (alphanumeric characters only)"
 			}
@@ -157,7 +157,7 @@
 		},
 		"vlNodeVMSize": {
 			"type": "string",
-			"defaultValue": "Standard_D1_v2",
+			"defaultValue": "",
 			"metadata": {
 				"description": "Size of the virtual machine for transaction nodes"
 			}
@@ -218,11 +218,7 @@
 		},
 		"omsDeploy": {
 			"type": "bool",
-			"defaultValue": false
-		},
-		"msiDeploy": {
-			"type": "bool",
-			"defaultValue": false
+			"defaultValue": true
 		},
 		"omsWorkspaceId": {
 			"type": "string",
@@ -261,15 +257,22 @@
 		"enableSshAccess":
 		{
 			"type": "bool",
-			"defaultValue": true,
+			"defaultValue": false,
 			"metadata": {
 				"description": "Enables or Disables the Network Security Group rule to allow SSH port access"
+			}
+		},
+		"azureStackDeployment": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {
+				"description": "Whether or not deployment is taking place on an Azure Stack environment."
 			}
 		},
 		"servicePrincipalId": 
 		{
 			"type": "string",
-			"defaultValue": "386182ed-4386-46f9-8326-bb2bd73258f2",
+			"defaultValue": "",
 			"metadata": {
 				"description": "Optional - Service principal ID for environments that do not support MSI."
 			}
@@ -277,7 +280,7 @@
 		"servicePrincipalSecret": 
 		{
 			"type": "string",
-			"defaultValue": "PfGap3LKWqWFivWBDP1BZOX5+yp799Rnej6AAu+BGp0=",
+			"defaultValue": "",
 			"metadata": {
 				"description": "Optional - Service principal secret for environments that do not support MSI."
 			}
@@ -285,7 +288,7 @@
 		"endpointFqdn": 
 		{
 			"type": "string",
-			"defaultValue": "redmond.ext-n42r2101.masd.stbtest.microsoft.com",
+			"defaultValue": "",
 			"metadata": {
 				"description": "The FQDN of the Azure Stack environemt. (e.g. local.azurestack.external)."
 			}
@@ -293,7 +296,7 @@
 		"tenantId": 
 		{
 			"type": "string",
-			"defaultValue": "0a9c9a9e-2774-489f-8560-bae5824f8b46",
+			"defaultValue": "",
 			"metadata": {
 				"description": "The name or ID or the AAD tenant. (e.g. mydomain.onmicrosoft.com)."
 			}
@@ -325,7 +328,7 @@
 		"dockerImagePoaOrchestrator": 
 		{
 			"type": "string",
-			"defaultValue": "orchestrator:latest32",
+			"defaultValue": "orchestrator:latest",
 			"metadata": {
 				"description": "Docker Orchestrator repository"
 			}
@@ -333,7 +336,7 @@
 		"dockerImageEtheradmin": 
 		{
 			"type": "string",
-			"defaultValue": "etheradmin:latest32",
+			"defaultValue": "etheradmin:latest",
 			"metadata": {
 				"description": "Docker EtherAdmin repository"
 			}
@@ -341,7 +344,7 @@
 		"dockerImageEthstat": 
 		{
 			"type": "string",
-			"defaultValue": "ethstat:latest32",
+			"defaultValue": "ethstat:latest",
 			"metadata": {
 				"description": "Docker Ethstat repository"
 			}
@@ -349,7 +352,7 @@
 		"dockerImageValidator": 
 		{
 			"type": "string",
-			"defaultValue": "validator:latest32",
+			"defaultValue": "validator:latest",
 			"metadata": {
 				"description": "Docker Validator repository"
 			}
@@ -357,7 +360,7 @@
 	},
 	"variables": {
 		"baseUrl": "[parameters('baseUrl')]",
-		"accessType": "[if(parameters('msiDeploy'), 'MSI', 'SPN')]",
+		"accessType": "[if(parameters('azureStackDeployment'), 'SPN', 'MSI')]",
 		"deploymentMode": "[if(parameters('isJoiningExistingNetwork'),'Member', 'Leader')]",
 		"deploymentGuid": "[if(parameters('isJoiningExistingNetwork'),'pid-fff6cb36-716f-46e8-bd34-10b25aabce22', 'pid-a5842b51-d2c6-486a-82e7-2bc2257ff545')]",
 		"poaScriptUrl": "[uri(variables('baseUrl'),'scripts/configure-poa.sh')]",
@@ -383,7 +386,7 @@
 		"dockerImageEthstat": "[parameters('dockerImageEthstat')]",
 		"dockerImageValidator": "[parameters('dockerImageValidator')]",
 		"linkedUrls": {
-			"vmssSetupUrl": "[uri(variables('baseUrl'),concat('nested/vmss-', if(parameters('msiDeploy'), 'with', 'without'), 'Extension.json'))]",
+			"vmssSetupUrl": "[uri(variables('baseUrl'),concat('nested/vmss-', if(parameters('azureStackDeployment'), 'without', 'with'), 'Extension.json'))]",
 			"vmssConfigUrl": "[uri(variables('baseUrl'),'nested/vmss-config.json')]",
 			"vmssNotificationUrl": "[uri(variables('baseUrl'),'nested/vmss-notification.json')]",
 			"connectionsSetupUrl": "[uri(variables('baseUrl'),'nested/connections.json')]",
@@ -392,7 +395,7 @@
 			"vnetgatewayUrl": "[uri(variables('baseUrl'),'nested/vnet-gateway.json')]",
 			"omsDeployUrl": "[uri(variables('baseUrl'),concat('nested/oms-', if(and(parameters('omsDeploy'), empty(parameters('omsWorkspaceId'))), 'DeployNew', 'Existing'), '.json'))]",
 			"keyVaultDeployUrl": "[uri(variables('baseUrl'),'nested/createKeyVault.json')]",
-			"storageDeployUrl": "[uri(variables('baseUrl'),concat('nested/storage-', if(parameters('msiDeploy'), 'acl', 'noacl'), '.json'))]"
+			"storageDeployUrl": "[uri(variables('baseUrl'),concat('nested/storage-', if(parameters('azureStackDeployment'), 'noacl', 'acl'), '.json'))]"
 		},
 		"vnetName": "[concat(variables('namingInfix'), '-vnet')]",
 		"vlSubnetName": "snet-vl",
@@ -687,7 +690,7 @@
 									"name": "accessPolicies",
 									"count": "[parameters('regionCount')]",
 									"input": {
-										"objectId": "[if(parameters('msiDeploy'), reference(variables('vmssDeploymentNames')[copyIndex('accessPolicies')].name).outputs.Result.value.vmssPrincipalId, parameters('servicePrincipalId'))]",
+										"objectId": "[if(parameters('azureStackDeployment'), parameters('servicePrincipalId'), reference(variables('vmssDeploymentNames')[copyIndex('accessPolicies')].name).outputs.Result.value.vmssPrincipalId)]",
 										"tenantId": "[subscription().tenantId]",
 										"permissions": {
 											"keys": [
