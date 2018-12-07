@@ -26,9 +26,6 @@
                     "services": {
                         "blob": {
                             "enabled": true
-                        },
-                        "file": {
-                            "enabled": true
                         }
                     },
                     "keySource": "Microsoft.Storage"
