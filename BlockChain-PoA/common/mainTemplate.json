@@ -626,7 +626,7 @@
 									"name": "accessPolicies",
 									"count": "[parameters('regionCount')]",
 									"input": {
-										"objectId": "[if(parameters('azureStackDeployment'), parameters('servicePrincipalId'), reference(variables('vmssDeploymentNames')[copyIndex('accessPolicies')].name).outputs.Result.value.vmssPrincipalId)]",
+										"objectId": "[if(parameters('azureStackDeployment'), parameters('servicePrincipalId'), reference(variables('vmssDeploymentNames')[copyIndex()].name).outputs.Result.value.vmssPrincipalId)]",
 										"tenantId": "[subscription().tenantId]",
 										"permissions": {
 											"keys": [
